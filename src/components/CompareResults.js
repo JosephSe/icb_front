@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Table, Heading } from 'govuk-react';
 
 const CompareResults = () => {
   const navigate = useNavigate();
@@ -9,19 +8,19 @@ const CompareResults = () => {
 
   return (
     <div className="container">
-      <Heading level={1}>Compare Results Together</Heading>
+      <h1>Compare Results Together</h1>
       <p>Compare the detailed results holistically</p>
-      <Table>
-        <Table.Head>
-          <Table.Row>
-            <Table.Cell header>Search Filters</Table.Cell>
-            <Table.Cell header>LEV - Birth</Table.Cell>
-            <Table.Cell header>IPCS</Table.Cell>
-            <Table.Cell header>DVLA</Table.Cell>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {[ 
+      <table className="search-results-table">
+        <thead>
+          <tr>
+            <th>Search Filters</th>
+            <th>LEV - Birth</th>
+            <th>IPCS</th>
+            <th>DVLA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[
             { label: "First Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
             { label: "Middle Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
             { label: "Last Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
@@ -30,18 +29,18 @@ const CompareResults = () => {
             { label: "Unique Identifier - Birth Cert", lev: "waiting...", ipcs: "N/A", dvla: "N/A" },
             { label: "Driving Licence Number", lev: "N/A", ipcs: "✔", dvla: "Resolution Required" },
           ].map((row, index) => (
-            <Table.Row key={index}>
-              <Table.Cell>{row.label}</Table.Cell>
-              <Table.Cell>{row.lev}</Table.Cell>
-              <Table.Cell>{row.ipcs}</Table.Cell>
-              <Table.Cell>{row.dvla}</Table.Cell>
-            </Table.Row>
+            <tr key={index}>
+              <td>{row.label}</td>
+              <td>{row.lev}</td>
+              <td>{row.ipcs}</td>
+              <td>{row.dvla}</td>
+            </tr>
           ))}
-        </Table.Body>
-      </Table>
+        </tbody>
+      </table>
       <div className="button-container">
-        <Button onClick={() => window.history.back()} className="govuk-button">Back</Button>
-        <Button onClick={() => navigate('/')} className="govuk-button">Home</Button>
+        <button onClick={() => window.history.back()} className="button">Back</button>
+        <button onClick={() => window.location.href = '/'} className="button">Home</button>
       </div>
     </div>
   );
