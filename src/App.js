@@ -6,7 +6,9 @@ import SearchSourceChoices from './components/SearchSourceChoices';
 import SearchFilters from './components/SearchFilters';
 import SearchInProgress from './components/SearchInProgress';
 import CompareResults from './components/CompareResults';
-import './App.css';  // Add this line
+
+
+//import './App.css';  // Add this line
 
 function App() {
   return (
