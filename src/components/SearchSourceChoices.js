@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Checkbox from '@govuk-react/checkbox';
-import {  Button } from 'govuk-react';
+import {  Button, Heading } from 'govuk-react';
 
 
 const SearchSourceChoices = () => {
@@ -29,7 +29,7 @@ const SearchSourceChoices = () => {
 
   return (
     <div className="container">
-      <h1 className="govuk-heading-l">Search Source Choices</h1>
+      <Heading className="govuk-heading-l">Search Source Choices</Heading>
       
       <div className="govuk-form-group">
   <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
