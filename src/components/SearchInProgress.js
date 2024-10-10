@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button, Heading, Paragraph } from 'govuk-react';
+import CompareResults from './CompareResults'; // Import the CompareResults component
 
 const SearchInProgress = () => {
-  const navigate = useNavigate();
-
   const [levBirthComplete, setLevBirthComplete] = useState(false);
   const [ipcsSearchComplete, setIpcsSearchComplete] = useState(false);
   const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
+  const [showCompareResults, setShowCompareResults] = useState(false); // State to control visibility of CompareResults
 
   useEffect(() => {
     const createTimer = (setComplete) => {
@@ -28,16 +27,17 @@ const SearchInProgress = () => {
   }, []);
 
   const handleViewDetails = () => {
-    navigate('/compare-results');
+    setShowCompareResults(true); // Show the CompareResults section when button is clicked
   };
 
   return (
-    <div className="container">
+    <div className="govuk-width-container">
       <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
-      <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-        <h1 className="govuk-fieldset__heading">Search In Progress</h1>
+        <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h1 className="govuk-fieldset__heading">Search In Progress</h1>
         </legend>
-        </fieldset>
+      </fieldset>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
         <div className="tile">
           <div className="tile-content">
@@ -111,9 +111,17 @@ const SearchInProgress = () => {
           )}
         </div>
       </div>
-      <div className="button-container">
+
+      {/* Conditionally render the CompareResults component */}
+      {showCompareResults && (
+        <div id="compare-results-section" style={{ marginTop: '20px' }}>
+          <CompareResults /> {/* Render the CompareResults component */}
+        </div>
+      )}
+
+      <div className="button-container" style={{ marginTop: '20px' }}>
         <Button onClick={() => window.history.back()} className="govuk-button">Back</Button>
-        <Button onClick={() => navigate('/')} className="govuk-button">Home</Button>
+        <Button onClick={() => window.location.href = '/'} className="govuk-button">Home</Button>
       </div>
     </div>
   );
