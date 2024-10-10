@@ -10,10 +10,15 @@ const SearchFilters = () => {
   return (
     <div className="govuk-width-container">
       <main className="govuk-main-wrapper" id="main-content" role="main">
-        <h1 className="govuk-heading-l">Search Filters</h1>
+      <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
+      <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 className="govuk-fieldset__heading">Search Filters</h1>
+        </legend>
+        </fieldset>
         
         {/* Unique Identifiers Section */}
         <h2 className="govuk-heading-m">Unique Identifiers</h2>
+
         <div className="form">
           {selectedSources.levBirth && (
             <div className="govuk-form-group">

@@ -29,17 +29,17 @@ const SearchSourceChoices = () => {
 
   return (
     <div className="container">
-      <Heading className="govuk-heading-l">Search Source Choices</Heading>
+      
       
       <div className="govuk-form-group">
   <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
     <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
       <h1 className="govuk-fieldset__heading">
-      Choose from the following search sources
+      Search Source Choices
       </h1>
     </legend>
     <div id="verification-hint" className="govuk-hint">
-      Select all that apply
+    Choose from the following search sources
     </div>
     <div className="govuk-checkboxes" data-module="govuk-checkboxes">
       <div className="govuk-checkboxes__item">

@@ -33,11 +33,15 @@ const SearchInProgress = () => {
 
   return (
     <div className="container">
-      <Heading level={1}>Search In Progress</Heading>
+      <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
+      <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 className="govuk-fieldset__heading">Search In Progress</h1>
+        </legend>
+        </fieldset>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
         <div className="tile">
           <div className="tile-content">
-            <Heading level={2}>LEV - BIRTH</Heading>
+            <h2 className="govuk-heading-m">LEV - BIRTH</h2>
             {!levBirthComplete ? (
               <>
                 <div className="loader"></div>
@@ -62,7 +66,7 @@ const SearchInProgress = () => {
 
         <div className="tile">
           <div className="tile-content">
-            <Heading level={2}>IPCS</Heading>
+            <h2 className="govuk-heading-m">IPCS</h2>
             {!ipcsSearchComplete ? (
               <>
                 <div className="loader"></div>
@@ -87,7 +91,7 @@ const SearchInProgress = () => {
 
         <div className="tile">
           <div className="tile-content">
-            <Heading level={2}>DVLA</Heading>
+            <h2 className="govuk-heading-m">DVLA</h2>
             {!dvlaSearchComplete ? (
               <>
                 <div className="loader"></div>
