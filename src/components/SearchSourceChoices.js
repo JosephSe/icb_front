@@ -52,35 +52,11 @@ const SearchSourceChoices = () => {
           onChange={handleCheckboxChange}
         />
         <label className="govuk-label govuk-checkboxes__label" htmlFor="levBirth">
-          Life Event Verification - Birth
+          LEV - Birth
         </label>
       </div>
-      <div className="govuk-checkboxes__item">
-        <input
-          className="govuk-checkboxes__input"
-          id="levMarriage"
-          name="lifeEvent"
-          type="checkbox"
-          value="marriage"
-          onChange={handleCheckboxChange}
-        />
-        <label className="govuk-label govuk-checkboxes__label" htmlFor="levMarriage">
-          Life Event Verification - Marriage
-        </label>
-      </div>
-      <div className="govuk-checkboxes__item">
-        <input
-          className="govuk-checkboxes__input"
-          id="levDeath"
-          name="lifeEvent"
-          type="checkbox"
-          value="death"
-          onChange={handleCheckboxChange}
-        />
-        <label className="govuk-label govuk-checkboxes__label" htmlFor="levDeath">
-          Life Event Verification - Death
-        </label>
-      </div>
+     
+      
       <div className="govuk-checkboxes__item">
         <input
           className="govuk-checkboxes__input"
@@ -107,19 +83,7 @@ const SearchSourceChoices = () => {
           IPCS - Irish Passport Check Service
         </label>
       </div>
-      <div className="govuk-checkboxes__item">
-        <input
-          className="govuk-checkboxes__input"
-          id="hmrc"
-          name="service"
-          type="checkbox"
-          value="hmrc"
-          onChange={handleCheckboxChange}
-        />
-        <label className="govuk-label govuk-checkboxes__label" htmlFor="hmrc">
-          HMRC - Tax-payer Verification Service
-        </label>
-      </div>
+      
     </div>
   </fieldset>
 </div>
