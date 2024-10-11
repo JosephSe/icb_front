@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Heading, Paragraph } from 'govuk-react';
-import CompareResults from './CompareResults'; // Import the CompareResults component
+import { Button, Paragraph } from 'govuk-react';
+import { useLocation } from 'react-router-dom';
+import CompareResults from './CompareResults';
 
 const SearchInProgress = () => {
+  const location = useLocation();
+  const selectedSources = location.state?.selectedSources || {};
   const [levBirthComplete, setLevBirthComplete] = useState(false);
   const [ipcsSearchComplete, setIpcsSearchComplete] = useState(false);
   const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
-  const [showCompareResults, setShowCompareResults] = useState(false); // State to control visibility of CompareResults
+  const [showCompareResults, setShowCompareResults] = useState(false);
 
   useEffect(() => {
     const createTimer = (setComplete) => {
@@ -16,18 +19,18 @@ const SearchInProgress = () => {
     };
 
     const timers = [
-      createTimer(setLevBirthComplete),
-      createTimer(setIpcsSearchComplete),
-      createTimer(setDvlaSearchComplete),
-    ];
+      selectedSources.levBirth ? createTimer(setLevBirthComplete) : null,
+      selectedSources.ipcs ? createTimer(setIpcsSearchComplete) : null,
+      selectedSources.dvla ? createTimer(setDvlaSearchComplete) : null,
+    ].filter(Boolean); // Filter out null values
 
     return () => {
       timers.forEach(clearTimeout);
     };
-  }, []);
+  }, [selectedSources]);
 
   const handleViewDetails = () => {
-    setShowCompareResults(true); // Show the CompareResults section when button is clicked
+    setShowCompareResults(true);
   };
 
   return (
@@ -39,83 +42,88 @@ const SearchInProgress = () => {
       </fieldset>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-        <div className="tile">
-          <div className="tile-content">
-            <h2 className="govuk-heading-m">LEV - BIRTH</h2>
+        {selectedSources.levBirth && (
+          <div className="tile">
+            <div className="tile-content">
+              <h2 className="govuk-heading-m">LEV - BIRTH</h2>
+              {!levBirthComplete ? (
+                <>
+                  <div className="loader"></div>
+                  <Paragraph>Searching...</Paragraph>
+                </>
+              ) : (
+                <>
+                  <Paragraph>Search Complete</Paragraph>
+                  <Paragraph>Identity Verification - 55%</Paragraph>
+                  <Paragraph>Nationality Verification - 95%</Paragraph>
+                  <Paragraph>Vulnerability Verification - N/A</Paragraph>
+                  <Paragraph>Eligibility Verification - N/A</Paragraph>
+                </>
+              )}
+            </div>
             {!levBirthComplete ? (
-              <>
-                <div className="loader"></div>
-                <Paragraph>Searching...</Paragraph>
-              </>
+              <Button className="tile-button" disabled>Stop</Button>
             ) : (
-              <>
-                <Paragraph>Search Complete</Paragraph>
-                <Paragraph>Identity Verification - 55%</Paragraph>
-                <Paragraph>Nationality Verification - 95%</Paragraph>
-                <Paragraph>Vulnerability Verification - N/A</Paragraph>
-                <Paragraph>Eligibility Verification - N/A</Paragraph>
-              </>
+              <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
           </div>
-          {!levBirthComplete ? (
-            <Button className="tile-button" disabled>Stop</Button>
-          ) : (
-            <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
-          )}
-        </div>
+        )}
 
-        <div className="tile">
-          <div className="tile-content">
-            <h2 className="govuk-heading-m">IPCS</h2>
+        {selectedSources.ipcs && (
+          <div className="tile">
+            <div className="tile-content">
+              <h2 className="govuk-heading-m">IPCS</h2>
+              {!ipcsSearchComplete ? (
+                <>
+                  <div className="loader"></div>
+                  <Paragraph>Searching...</Paragraph>
+                </>
+              ) : (
+                <>
+                  <Paragraph>Search Complete</Paragraph>
+                  <Paragraph>Identity Verification - 95%</Paragraph>
+                  <Paragraph>Nationality Verification - N/A</Paragraph>
+                  <Paragraph>Vulnerability Verification - N/A</Paragraph>
+                  <Paragraph>Eligibility Verification - N/A</Paragraph>
+                </>
+              )}
+            </div>
             {!ipcsSearchComplete ? (
-              <>
-                <div className="loader"></div>
-                <Paragraph>Searching...</Paragraph>
-              </>
+              <Button className="tile-button" disabled>Stop</Button>
             ) : (
-              <>
-                <Paragraph>Search Complete</Paragraph>
-                <Paragraph>Identity Verification - 95%</Paragraph>
-                <Paragraph>Nationality Verification - N/A</Paragraph>
-                <Paragraph>Vulnerability Verification - N/A</Paragraph>
-                <Paragraph>Eligibility Verification - N/A</Paragraph>
-              </>
+              <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
           </div>
-          {!ipcsSearchComplete ? (
-            <Button className="tile-button" disabled>Stop</Button>
-          ) : (
-            <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
-          )}
-        </div>
+        )}
 
-        <div className="tile">
-          <div className="tile-content">
-            <h2 className="govuk-heading-m">DVLA</h2>
+        {selectedSources.dvla && (
+          <div className="tile">
+            <div className="tile-content">
+              <h2 className="govuk-heading-m">DVLA</h2>
+              {!dvlaSearchComplete ? (
+                <>
+                  <div className="loader"></div>
+                  <Paragraph>Searching...</Paragraph>
+                </>
+              ) : (
+                <>
+                  <Paragraph>Search Incomplete</Paragraph>
+                  <Paragraph>Multiple Matches Found</Paragraph>
+                </>
+              )}
+            </div>
             {!dvlaSearchComplete ? (
-              <>
-                <div className="loader"></div>
-                <Paragraph>Searching...</Paragraph>
-              </>
+              <Button className="tile-button" disabled>Stop</Button>
             ) : (
-              <>
-                <Paragraph>Search Incomplete</Paragraph>
-                <Paragraph>Multiple Matches Found</Paragraph>
-              </>
+              <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
           </div>
-          {!dvlaSearchComplete ? (
-            <Button className="tile-button" disabled>Stop</Button>
-          ) : (
-            <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Conditionally render the CompareResults component */}
       {showCompareResults && (
         <div id="compare-results-section" style={{ marginTop: '20px' }}>
-          <CompareResults /> {/* Render the CompareResults component */}
+          <CompareResults />
         </div>
       )}
 

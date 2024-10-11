@@ -1,3 +1,4 @@
+// src/components/SearchFilters.js
 import { Button } from 'govuk-react';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -5,28 +6,30 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const SearchFilters = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedSources = location.state?.selectedSources || {};
-  
+  const searchFilter = location.state?.selectedSources;
+
+  // Extract selected sources for easy access
+  const selectedArray = searchFilter?.searchSources || [];
+
   return (
     <div className="govuk-width-container">
       <main className="govuk-main-wrapper" id="main-content" role="main">
-      <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
-      <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-        <h1 className="govuk-fieldset__heading">Search Filters</h1>
-        </legend>
+        <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
+          <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 className="govuk-fieldset__heading">Search Filters</h1>
+          </legend>
         </fieldset>
-        
+
         {/* Unique Identifiers Section */}
         <h2 className="govuk-heading-m">Unique Identifiers</h2>
-
         <div className="form">
-          {selectedSources.levBirth && (
+          {selectedArray.includes('LEV') && (
             <div className="govuk-form-group">
               <label htmlFor="bcert" className="govuk-label">Birth Certificate Number:</label>
               <input type="text" id="bcert" placeholder="Birth Certificate Number" className="govuk-input" />
             </div>
           )}
-          {selectedSources.dvla && (
+          {selectedArray.includes('DVLA') && (
             <div className="govuk-form-group">
               <label htmlFor="did" className="govuk-label">Driving Licence Number:</label>
               <input type="text" id="did" placeholder="Enter identifier" className="govuk-input" />
@@ -50,23 +53,18 @@ const SearchFilters = () => {
             <input type="text" id="lastName" placeholder="Last Name" className="govuk-input" />
           </div>
 
-          {/* Date of Birth Section (Updated as Fieldset) */}
+          {/* Date of Birth Section */}
           <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h2 className="govuk-fieldset__heading">Date of Birth</h2>
             </legend>
-
-            {/* Date of Birth Hint */}
             <div id="dob-hint" className="govuk-hint">
               For example, 31 3 1980
             </div>
-
             <div className="govuk-date-input" id="dob">
               <div className="govuk-date-input__item">
                 <div className="govuk-form-group">
-                  <label className="govuk-label govuk-date-input__label" htmlFor="dob-day">
-                    Day
-                  </label>
+                  <label className="govuk-label govuk-date-input__label" htmlFor="dob-day">Day</label>
                   <input
                     className="govuk-input govuk-date-input__input govuk-input--width-2"
                     id="dob-day"
@@ -77,12 +75,9 @@ const SearchFilters = () => {
                   />
                 </div>
               </div>
-
               <div className="govuk-date-input__item">
                 <div className="govuk-form-group">
-                  <label className="govuk-label govuk-date-input__label" htmlFor="dob-month">
-                    Month
-                  </label>
+                  <label className="govuk-label govuk-date-input__label" htmlFor="dob-month">Month</label>
                   <input
                     className="govuk-input govuk-date-input__input govuk-input--width-2"
                     id="dob-month"
@@ -93,12 +88,9 @@ const SearchFilters = () => {
                   />
                 </div>
               </div>
-
               <div className="govuk-date-input__item">
                 <div className="govuk-form-group">
-                  <label className="govuk-label govuk-date-input__label" htmlFor="dob-year">
-                    Year
-                  </label>
+                  <label className="govuk-label govuk-date-input__label" htmlFor="dob-year">Year</label>
                   <input
                     className="govuk-input govuk-date-input__input govuk-input--width-4"
                     id="dob-year"
@@ -112,8 +104,8 @@ const SearchFilters = () => {
             </div>
           </fieldset>
 
-          {/* Address Section */}
-          <fieldset className="govuk-fieldset">
+            {/* Address Section */}
+            <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h2 className="govuk-fieldset__heading">Address</h2>
             </legend>
@@ -134,11 +126,11 @@ const SearchFilters = () => {
               <input className="govuk-input govuk-input--width-10" id="address-postcode" name="addressPostcode" type="text" placeholder="Postcode" autoComplete="postal-code" />
             </div>
           </fieldset>
-        </div>
-        
-        <div className="button-container">
-          <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
-          <Button onClick={() => navigate('/search-in-progress')} className="govuk-button">Continue</Button>
+
+          <div className="button-container">
+            <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
+            <Button onClick={() => navigate('/search-in-progress')} className="govuk-button">Continue</Button>
+          </div>
         </div>
       </main>
     </div>
