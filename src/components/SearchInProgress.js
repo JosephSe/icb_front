@@ -5,7 +5,10 @@ import CompareResults from './CompareResults';
 
 const SearchInProgress = () => {
   const location = useLocation();
-  const selectedSources = location.state?.selectedSources || {};
+  const searchFilter = location.state?.selectedFilter;
+
+  // Extract selected sources for easy access
+  const selectedArray = searchFilter?.searchSources || [];
   const [levBirthComplete, setLevBirthComplete] = useState(false);
   const [ipcsSearchComplete, setIpcsSearchComplete] = useState(false);
   const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
@@ -19,17 +22,18 @@ const SearchInProgress = () => {
     };
 
     const timers = [
-      selectedSources.levBirth ? createTimer(setLevBirthComplete) : null,
-      selectedSources.ipcs ? createTimer(setIpcsSearchComplete) : null,
-      selectedSources.dvla ? createTimer(setDvlaSearchComplete) : null,
-    ].filter(Boolean); // Filter out null values
-
+      
+      createTimer(setLevBirthComplete),
+      createTimer(setIpcsSearchComplete),
+      createTimer(setDvlaSearchComplete),
+    ];
     return () => {
       timers.forEach(clearTimeout);
     };
-  }, [selectedSources]);
+  }, [selectedArray]);
 
   const handleViewDetails = () => {
+    
     setShowCompareResults(true);
   };
 
@@ -42,7 +46,7 @@ const SearchInProgress = () => {
       </fieldset>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-        {selectedSources.levBirth && (
+        {selectedArray.includes('LEV') &&(
           <div className="tile">
             <div className="tile-content">
               <h2 className="govuk-heading-m">LEV - BIRTH</h2>
@@ -69,7 +73,7 @@ const SearchInProgress = () => {
           </div>
         )}
 
-        {selectedSources.ipcs && (
+        {selectedArray.includes ('IPCS')&& (
           <div className="tile">
             <div className="tile-content">
               <h2 className="govuk-heading-m">IPCS</h2>
@@ -92,11 +96,12 @@ const SearchInProgress = () => {
               <Button className="tile-button" disabled>Stop</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
+
             )}
           </div>
         )}
 
-        {selectedSources.dvla && (
+        {selectedArray.includes ('DVLA')&& (
           <div className="tile">
             <div className="tile-content">
               <h2 className="govuk-heading-m">DVLA</h2>

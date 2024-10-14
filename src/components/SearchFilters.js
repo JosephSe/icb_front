@@ -1,4 +1,3 @@
-// src/components/SearchFilters.js
 import { Button } from 'govuk-react';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -6,10 +5,24 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const SearchFilters = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Ensure searchFilter is properly defined and handles cases when location.state is undefined
   const searchFilter = location.state?.selectedSources;
 
   // Extract selected sources for easy access
   const selectedArray = searchFilter?.searchSources || [];
+
+  const handleContinue = () => {
+    const filteredSources = selectedArray;
+
+    if (filteredSources.length === 0) {
+      console.error("No valid sources selected.");
+      return;
+    }
+
+    // Navigate to the next page with selected sources
+    navigate('/search-in-progress', { state: { selectedFilter: searchFilter } });
+  };
 
   return (
     <div className="govuk-width-container">
@@ -104,8 +117,8 @@ const SearchFilters = () => {
             </div>
           </fieldset>
 
-            {/* Address Section */}
-            <fieldset className="govuk-fieldset">
+          {/* Address Section */}
+          <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h2 className="govuk-fieldset__heading">Address</h2>
             </legend>
@@ -129,7 +142,7 @@ const SearchFilters = () => {
 
           <div className="button-container">
             <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
-            <Button onClick={() => navigate('/search-in-progress')} className="govuk-button">Continue</Button>
+            <Button onClick={handleContinue} className="govuk-button">Continue</Button>
           </div>
         </div>
       </main>
