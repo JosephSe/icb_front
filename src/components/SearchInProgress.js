@@ -13,6 +13,7 @@ const SearchInProgress = () => {
   const [ipcsSearchComplete, setIpcsSearchComplete] = useState(false);
   const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
   const [showCompareResults, setShowCompareResults] = useState(false);
+  const [selectedSources, setSelectedSources] = useState(selectedArray);
 
   useEffect(() => {
     const createTimer = (setComplete) => {
@@ -22,7 +23,6 @@ const SearchInProgress = () => {
     };
 
     const timers = [
-      
       createTimer(setLevBirthComplete),
       createTimer(setIpcsSearchComplete),
       createTimer(setDvlaSearchComplete),
@@ -33,8 +33,8 @@ const SearchInProgress = () => {
   }, [selectedArray]);
 
   const handleViewDetails = () => {
-    
-    setShowCompareResults(true);
+    setSelectedSources(selectedArray); // Set the selected sources in local state
+    setShowCompareResults(true); // Show the comparison table on the same page
   };
 
   return (
@@ -46,7 +46,7 @@ const SearchInProgress = () => {
       </fieldset>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-        {selectedArray.includes('LEV') &&(
+        {selectedArray.includes('LEV') && (
           <div className="tile">
             <div className="tile-content">
               <h2 className="govuk-heading-m">LEV - BIRTH</h2>
@@ -73,7 +73,7 @@ const SearchInProgress = () => {
           </div>
         )}
 
-        {selectedArray.includes ('IPCS')&& (
+        {selectedArray.includes('IPCS') && (
           <div className="tile">
             <div className="tile-content">
               <h2 className="govuk-heading-m">IPCS</h2>
@@ -96,12 +96,11 @@ const SearchInProgress = () => {
               <Button className="tile-button" disabled>Stop</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
-
             )}
           </div>
         )}
 
-        {selectedArray.includes ('DVLA')&& (
+        {selectedArray.includes('DVLA') && (
           <div className="tile">
             <div className="tile-content">
               <h2 className="govuk-heading-m">DVLA</h2>
@@ -128,7 +127,7 @@ const SearchInProgress = () => {
 
       {showCompareResults && (
         <div id="compare-results-section" style={{ marginTop: '20px' }}>
-          <CompareResults />
+          <CompareResults selectedSources={selectedSources} />
         </div>
       )}
 
