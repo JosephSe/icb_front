@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Paragraph } from 'govuk-react';
 import { useLocation } from 'react-router-dom';
 import CompareResults from './CompareResults';
-import SearchResult from '../models/SearchResult';
+//import SearchResult from '../models/SearchResult';
 
 const SearchInProgress = () => {
   const location = useLocation();
