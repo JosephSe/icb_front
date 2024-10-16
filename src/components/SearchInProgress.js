@@ -14,6 +14,8 @@ const SearchInProgress = () => {
   const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
   const [showCompareResults, setShowCompareResults] = useState(false);
   const [selectedSources, setSelectedSources] = useState(selectedArray);
+  
+  
 
   useEffect(() => {
     const createTimer = (setComplete) => {

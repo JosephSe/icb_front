@@ -1,5 +1,5 @@
 import { Button } from 'govuk-react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const SearchFilters = () => {
@@ -11,6 +11,20 @@ const SearchFilters = () => {
 
   // Extract selected sources for easy access
   const selectedArray = searchFilter?.searchSources || [];
+
+  // State for first name, last name, and button enablement
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+
+  // Check if both first name and last name are filled to enable the button
+  useEffect(() => {
+    if (firstName.trim() !== '' && lastName.trim() !== '') {
+      setIsButtonEnabled(true);
+    } else {
+      setIsButtonEnabled(false);
+    }
+  }, [firstName, lastName]);
 
   const handleContinue = () => {
     const filteredSources = selectedArray;
@@ -54,16 +68,36 @@ const SearchFilters = () => {
         <h2 className="govuk-heading-m">Biographic Details</h2>
         <div className="form">
           <div className="govuk-form-group">
-            <label htmlFor="firstName" className="govuk-label">First Name:</label>
-            <input type="text" id="firstName" placeholder="First Name" className="govuk-input" />
+            <label htmlFor="firstName" className="govuk-label">
+              First Name <span className="govuk-required"> *</span>
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First Name"
+              className="govuk-input"
+              required
+            />
           </div>
           <div className="govuk-form-group">
             <label htmlFor="middleName" className="govuk-label">Middle Name:</label>
             <input type="text" id="middleName" placeholder="Middle Name" className="govuk-input" />
           </div>
           <div className="govuk-form-group">
-            <label htmlFor="lastName" className="govuk-label">Last Name:</label>
-            <input type="text" id="lastName" placeholder="Last Name" className="govuk-input" />
+            <label htmlFor="lastName" className="govuk-label">
+              Last Name <span className="govuk-required"> *</span>
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last Name"
+              className="govuk-input"
+              required
+            />
           </div>
 
           {/* Date of Birth Section */}
@@ -142,7 +176,13 @@ const SearchFilters = () => {
 
           <div className="button-container">
             <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
-            <Button onClick={handleContinue} className="govuk-button">Continue</Button>
+            <Button
+              onClick={handleContinue}
+              className="govuk-button"
+              disabled={!isButtonEnabled}  // Disable button until first and last name are filled
+            >
+              Continue
+            </Button>
           </div>
         </div>
       </main>
