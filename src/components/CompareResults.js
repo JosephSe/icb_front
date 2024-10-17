@@ -2,13 +2,13 @@ import React from 'react';
 
 const CompareResults = ({ selectedSources }) => {
   const data = [
-    { label: "First Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
-    { label: "Middle Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
-    { label: "Last Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
-    { label: "Date of Birth", lev: "waiting...", ipcs: "—", dvla: "Resolution Required" },
-    { label: "Address", lev: "waiting...", ipcs: "", dvla: "Resolution Required" },
-    { label: "Unique Identifier - Birth Cert", lev: "waiting...", ipcs: "N/A", dvla: "N/A" },
-    { label: "Driving Licence Number", lev: "N/A", ipcs: "✔", dvla: "Resolution Required" },
+    { label: "First Name", fields: { LEV: "waiting...", IPCS: "✔", DVLA: "Resolution Required" } },
+    { label: "Middle Name", fields: { LEV: "waiting...", IPCS: "✔", DVLA: "Resolution Required" } },
+    { label: "Last Name", fields: { LEV: "waiting...", IPCS: "✔", DVLA: "Resolution Required" } },
+    { label: "Date of Birth", fields: { LEV: "waiting...", IPCS: "—", DVLA: "Resolution Required" } },
+    { label: "Address", fields: { LEV: "waiting...", IPCS: "", DVLA: "Resolution Required" } },
+    { label: "Unique Identifier - Birth Cert", fields: { LEV: "waiting...", IPCS: "N/A", DVLA: "N/A" } },
+    { label: "Driving Licence Number", fields: { LEV: "N/A", IPCS: "✔", DVLA: "Resolution Required" } },
   ];
 
   return (
@@ -26,21 +26,27 @@ const CompareResults = ({ selectedSources }) => {
           <thead className="govuk-table__head">
             <tr className="govuk-table__row">
               <th scope="col" className="govuk-table__header">Search Filters</th>
-              {selectedSources.includes('LEV') && <th scope="col" className="govuk-table__header">LEV - Birth</th>}
-              {selectedSources.includes('IPCS') && <th scope="col" className="govuk-table__header">IPCS</th>}
-              {selectedSources.includes('DVLA') && <th scope="col" className="govuk-table__header">DVLA</th>}
+              {selectedSources.map((source) => (
+                <th key={source} scope="col" className="govuk-table__header">
+                  {source === 'LEV' ? 'LEV - Birth' : source}
+                </th>
+              ))}
             </tr>
+
           </thead>
           <tbody className="govuk-table__body">
             {data.map((row, index) => (
               <tr className="govuk-table__row" key={index}>
                 <th scope="row" className="govuk-table__header">{row.label}</th>
-                {selectedSources.includes('LEV') && <td className="govuk-table__cell">{row.lev}</td>}
-                {selectedSources.includes('IPCS') && <td className="govuk-table__cell">{row.ipcs}</td>}
-                {selectedSources.includes('DVLA') && <td className="govuk-table__cell">{row.dvla}</td>}
+                {selectedSources.map((source) =>
+                  selectedSources.includes(source) && (
+                    <td className="govuk-table__cell" key={source}>{row.fields[source]}</td>
+                  )
+                )}
               </tr>
             ))}
           </tbody>
+
         </table>
       </main>
     </div>
