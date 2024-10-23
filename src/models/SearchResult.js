@@ -1,11 +1,11 @@
 class SearchResult {
-    constructor(source, complete, idVerification, nationality,vulnerability,eligibility) {
+    constructor(source, complete, matches, verifications) {
       this.source = source;
       this.complete = complete;
-      this.idVerification = idVerification;
-      this.nationality = nationality;
-      this.vulnerability = vulnerability;
-      this.eligibility = eligibility;
+      this.matches = matches
+      this.verifications = verifications;
+      // this.firstNameMatched = firstNameMatched;
+      // this.lastNameMatched = lastNameMatched;
     }
   }
   

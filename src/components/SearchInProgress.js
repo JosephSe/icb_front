@@ -3,6 +3,7 @@ import { Button, Paragraph } from 'govuk-react';
 import { useLocation } from 'react-router-dom';
 import CompareResults from './CompareResults';
 import SearchResult from '../models/SearchResult';
+import {Client} from '@stomp/stompjs'
 
 const SearchInProgress = () => {
   const location = useLocation();
@@ -10,53 +11,67 @@ const SearchInProgress = () => {
 
   // Extract selected sources for easy access
   const selectedArray = searchFilter?.searchSources || [];
-  const [levBirthComplete, setLevBirthComplete] = useState(false);
-  const [ipcsSearchComplete, setIpcsSearchComplete] = useState(false);
-  const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
   const [showCompareResults, setShowCompareResults] = useState(false);
   const [selectedSources, setSelectedSources] = useState(selectedArray);
+  const [searchResults, setSearchResults] = useState([]);
   
-  const searchCompleteStatus = {
-    LEV: { complete: levBirthComplete, idVerification: 'Identity Verification - 55%', nationality: 'Nationality Verification - 95%', vulnerability: 'Vulnerability Verification - N/A', eligibility: 'Eligibility Verification - N/A' },
-    IPCS: { complete: ipcsSearchComplete, idVerification: 'Identity Verification - 95%', nationality: 'Nationality Verification - N/A', vulnerability: 'Vulnerability Verification - N/A', eligibility: 'Eligibility Verification - N/A' },
-    DVLA: { complete: dvlaSearchComplete, idVerification: 'Identity Verification - N/A', nationality: 'Nationality Verification - Multiple Matches Found', vulnerability: 'Vulnerability Verification - N/A', eligibility: 'Eligibility Verification - N/A' },
-  };
-
-  // Create an array to hold SearchResult objects
-  const searchResults = [];
   selectedArray.forEach(source => {
-    const result = searchCompleteStatus[source];
-    
-    if (result) {
+    const index = searchResults.findIndex(item => item.source === source);
+    if (index === -1) {
       const searchResult = new SearchResult(
         source,
-        result.complete,
-        result.idVerification,
-        result.nationality,
-        result.vulnerability,
-        result.eligibility
+        false
       );
-
       searchResults.push(searchResult);
     }
   });
 
   useEffect(() => {
-    const createTimer = (setComplete) => {
-      return setTimeout(() => {
-        setComplete(true);
-      }, Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000);
+    const stompClient = new Client({
+      brokerURL: 'ws://localhost:8080/ws'
+    });
+  
+    stompClient.onConnect = (frame) => {
+      stompClient.subscribe('/session/topic/results', (greeting) => {
+          const result = JSON.parse(greeting.body);
+          const searchResult = new SearchResult(result.searchSource, result.searchComplete, result.match.matches, result.match.verifications);
+          console.log('Received: ', result.match.matches);
+          setSearchResults(prevResults => {
+            const index = prevResults.findIndex(item => item.source === result.searchSource);
+            if (index !== -1) {
+              prevResults[index] = searchResult;
+              return [...prevResults];
+            } else {
+              return [...prevResults, searchResult];
+            }
+          })
+      });
+      console.log('results ->>>', searchResults);
+      stompClient.publish({
+        destination: "/app/search",
+        body: '{"searchSources":["DVLA"], "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}'
+      });  
     };
+    stompClient.activate();
+    // const createTimer = (setComplete) => {
+    //   return setTimeout(() => {
+    //     setComplete(true);
+    //   }, Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000);
+    // };
 
-    const timers = [
-      createTimer(setLevBirthComplete),
-      createTimer(setIpcsSearchComplete),
-      createTimer(setDvlaSearchComplete),
-    ];
+    // const timers = [
+    //   createTimer(setLevBirthComplete),
+    //   createTimer(setIpcsSearchComplete),
+    //   createTimer(setDvlaSearchComplete),
+    // ];
+    // Cleanup function to disconnect the client when the component unmounts
     return () => {
-      timers.forEach(clearTimeout);
+      if (stompClient.connected) {
+        stompClient.deactivate();
+        console.log('Disconnected');
+      }
     };
-  }, [selectedArray]);
+  }, []);
 
   const handleViewDetails = () => {
     setSelectedSources(selectedArray); // Set the selected sources in local state
@@ -84,10 +99,7 @@ const SearchInProgress = () => {
               ) : (
                 <>
                   <Paragraph>Search Complete</Paragraph>
-                  <Paragraph>{result.idVerification}</Paragraph>
-                  <Paragraph>{result.nationality}</Paragraph>
-                  <Paragraph>{result.vulnerability}</Paragraph>
-                  <Paragraph>{result.eligibility}</Paragraph>
+                  <Paragraph>{result.verifications}</Paragraph>
                 </>
               )}
             </div>
@@ -102,7 +114,7 @@ const SearchInProgress = () => {
 
       {showCompareResults && (
         <div id="compare-results-section" style={{ marginTop: '20px' }}>
-          <CompareResults selectedSources={selectedSources} />
+          <CompareResults searchResults={searchResults} selectedSources={selectedSources} />
         </div>
       )}
 
