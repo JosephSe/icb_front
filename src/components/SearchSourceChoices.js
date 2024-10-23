@@ -1,12 +1,11 @@
-// src/components/SearchSourceChoices.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Checkbox from '@govuk-react/checkbox';
-import { Button } from 'govuk-react';
-import SearchFilter from '../models/SearchFilter'; // Import  SearchFilter model
-import UniqueId from '../models/UniqueID'; // Import  UniqueId model
-import BioDetails from '../models/BioDetails'; // Import  BioDetails model
-import Address from '../models/Address'; // Import  Address model
+import { Button, ErrorText } from 'govuk-react';
+import SearchFilter from '../models/SearchFilter'; // Import SearchFilter model
+import UniqueId from '../models/UniqueID'; // Import UniqueId model
+import BioDetails from '../models/BioDetails'; // Import BioDetails model
+import Address from '../models/Address'; // Import Address model
 
 const SearchSourceChoices = () => {
   const navigate = useNavigate();
@@ -19,13 +18,15 @@ const SearchSourceChoices = () => {
     hmrc: false,
   });
 
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+
   const handleCheckboxChange = (event) => {
     setSelectedSources({
       ...selectedSources,
       [event.target.id]: event.target.checked,
     });
   };
- 
+
   const handleContinue = () => {
     const filteredSources = [];
 
@@ -34,13 +35,18 @@ const SearchSourceChoices = () => {
     if (selectedSources.ipcs) filteredSources.push('IPCS');
 
     if (filteredSources.length === 0) {
-      console.error("No valid sources selected.");
-      return ;
+      // Set error message if no checkboxes are selected
+      setErrorMessage("Please select at least one search source.");
+      return;
     }
+
+    // Clear the error message and proceed
+    setErrorMessage('');
 
     // Create an instance of SearchFilter
     const searchFilter = new SearchFilter(filteredSources);
 
+    // Navigate to the next page with selected sources
     navigate('/search-filters', { state: { selectedSources: searchFilter } });
   };
 
@@ -54,6 +60,10 @@ const SearchSourceChoices = () => {
           <div id="verification-hint" className="govuk-hint">
             Choose from the following search sources
           </div>
+          
+          {/* Display error message if present */}
+          {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
+
           <div className="govuk-checkboxes" data-module="govuk-checkboxes">
             <div className="govuk-checkboxes__item">
               <input

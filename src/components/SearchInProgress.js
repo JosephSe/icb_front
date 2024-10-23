@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Paragraph } from 'govuk-react';
 import { useLocation } from 'react-router-dom';
 import CompareResults from './CompareResults';
+import SearchResult from '../models/SearchResult';
+import {Client} from '@stomp/stompjs'
 
 const SearchInProgress = () => {
   const location = useLocation();
@@ -9,28 +11,66 @@ const SearchInProgress = () => {
 
   // Extract selected sources for easy access
   const selectedArray = searchFilter?.searchSources || [];
-  const [levBirthComplete, setLevBirthComplete] = useState(false);
-  const [ipcsSearchComplete, setIpcsSearchComplete] = useState(false);
-  const [dvlaSearchComplete, setDvlaSearchComplete] = useState(false);
   const [showCompareResults, setShowCompareResults] = useState(false);
   const [selectedSources, setSelectedSources] = useState(selectedArray);
+  const [searchResults, setSearchResults] = useState([]);
+  
+  selectedArray.forEach(source => {
+    const index = searchResults.findIndex(item => item.source === source);
+    if (index === -1) {
+      const searchResult = new SearchResult(
+        source,
+        false
+      );
+      searchResults.push(searchResult);
+    }
+  });
 
   useEffect(() => {
-    const createTimer = (setComplete) => {
-      return setTimeout(() => {
-        setComplete(true);
-      }, Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000);
+    const stompClient = new Client({
+      brokerURL: 'ws://localhost:8080/ws'
+    });
+  
+    stompClient.onConnect = (frame) => {
+      stompClient.subscribe('/session/topic/results', (greeting) => {
+          const result = JSON.parse(greeting.body);
+          const searchResult = new SearchResult(result.searchSource, result.searchComplete, result.match.matches, result.match.verifications);
+          setSearchResults(prevResults => {
+            const index = prevResults.findIndex(item => item.source === result.searchSource);
+            if (index !== -1) {
+              prevResults[index] = searchResult;
+              return [...prevResults];
+            } else {
+              return [...prevResults, searchResult];
+            }
+          })
+      });
+      const jsonString = `{"searchSources":${JSON.stringify(selectedArray)}, "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}`
+      stompClient.publish({
+        destination: "/app/search",
+        body: jsonString
+      });  
     };
+    stompClient.activate();
+    // const createTimer = (setComplete) => {
+    //   return setTimeout(() => {
+    //     setComplete(true);
+    //   }, Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000);
+    // };
 
-    const timers = [
-      createTimer(setLevBirthComplete),
-      createTimer(setIpcsSearchComplete),
-      createTimer(setDvlaSearchComplete),
-    ];
+    // const timers = [
+    //   createTimer(setLevBirthComplete),
+    //   createTimer(setIpcsSearchComplete),
+    //   createTimer(setDvlaSearchComplete),
+    // ];
+    // Cleanup function to disconnect the client when the component unmounts
     return () => {
-      timers.forEach(clearTimeout);
+      if (stompClient.connected) {
+        stompClient.deactivate();
+        console.log('Disconnected');
+      }
     };
-  }, [selectedArray]);
+  }, []);
 
   const handleViewDetails = () => {
     setSelectedSources(selectedArray); // Set the selected sources in local state
@@ -46,11 +86,11 @@ const SearchInProgress = () => {
       </fieldset>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-        {selectedArray.includes('LEV') && (
-          <div className="tile">
+        {searchResults.map((result, index) => (
+          <div className="tile" key={result.source}>
             <div className="tile-content">
-              <h2 className="govuk-heading-m">LEV - BIRTH</h2>
-              {!levBirthComplete ? (
+              <h2 className="govuk-heading-m">{result.source === 'LEV' ? 'LEV - BIRTH' : result.source}</h2>
+              {!result.complete ? (
                 <>
                   <div className="loader"></div>
                   <Paragraph>Searching...</Paragraph>
@@ -58,76 +98,27 @@ const SearchInProgress = () => {
               ) : (
                 <>
                   <Paragraph>Search Complete</Paragraph>
-                  <Paragraph>Identity Verification - 55%</Paragraph>
-                  <Paragraph>Nationality Verification - 95%</Paragraph>
-                  <Paragraph>Vulnerability Verification - N/A</Paragraph>
-                  <Paragraph>Eligibility Verification - N/A</Paragraph>
+                  <div key={index}>
+                    {result.verifications && result.verifications.map((verification, idx) => (
+                      <Paragraph>{verification}</Paragraph>
+                    ))}
+                  </div>
+                  <Paragraph>{result.verifications}</Paragraph>
                 </>
               )}
             </div>
-            {!levBirthComplete ? (
+            {!result.complete ? (
               <Button className="tile-button" disabled>Stop</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
           </div>
-        )}
-
-        {selectedArray.includes('IPCS') && (
-          <div className="tile">
-            <div className="tile-content">
-              <h2 className="govuk-heading-m">IPCS</h2>
-              {!ipcsSearchComplete ? (
-                <>
-                  <div className="loader"></div>
-                  <Paragraph>Searching...</Paragraph>
-                </>
-              ) : (
-                <>
-                  <Paragraph>Search Complete</Paragraph>
-                  <Paragraph>Identity Verification - 95%</Paragraph>
-                  <Paragraph>Nationality Verification - N/A</Paragraph>
-                  <Paragraph>Vulnerability Verification - N/A</Paragraph>
-                  <Paragraph>Eligibility Verification - N/A</Paragraph>
-                </>
-              )}
-            </div>
-            {!ipcsSearchComplete ? (
-              <Button className="tile-button" disabled>Stop</Button>
-            ) : (
-              <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
-            )}
-          </div>
-        )}
-
-        {selectedArray.includes('DVLA') && (
-          <div className="tile">
-            <div className="tile-content">
-              <h2 className="govuk-heading-m">DVLA</h2>
-              {!dvlaSearchComplete ? (
-                <>
-                  <div className="loader"></div>
-                  <Paragraph>Searching...</Paragraph>
-                </>
-              ) : (
-                <>
-                  <Paragraph>Search Incomplete</Paragraph>
-                  <Paragraph>Multiple Matches Found</Paragraph>
-                </>
-              )}
-            </div>
-            {!dvlaSearchComplete ? (
-              <Button className="tile-button" disabled>Stop</Button>
-            ) : (
-              <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
-            )}
-          </div>
-        )}
+        ))}
       </div>
 
       {showCompareResults && (
         <div id="compare-results-section" style={{ marginTop: '20px' }}>
-          <CompareResults selectedSources={selectedSources} />
+          <CompareResults searchResults={searchResults} selectedSources={selectedSources} />
         </div>
       )}
 

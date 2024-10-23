@@ -1,15 +1,46 @@
 import React from 'react';
 
-const CompareResults = ({ selectedSources }) => {
+const CompareResults = ({ searchResults, selectedSources }) => {
   const data = [
-    { label: "First Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
-    { label: "Middle Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
-    { label: "Last Name", lev: "waiting...", ipcs: "✔", dvla: "Resolution Required" },
-    { label: "Date of Birth", lev: "waiting...", ipcs: "—", dvla: "Resolution Required" },
-    { label: "Address", lev: "waiting...", ipcs: "", dvla: "Resolution Required" },
-    { label: "Unique Identifier - Birth Cert", lev: "waiting...", ipcs: "N/A", dvla: "N/A" },
-    { label: "Driving Licence Number", lev: "N/A", ipcs: "✔", dvla: "Resolution Required" },
+    // { label: "First Name", fields: {  } },
+    // { label: "Middle Name", fields: {  } },
+    // { label: "Last Name", fields: { } },
+    // { label: "Date of Birth", fields: { } },
+    // { label: "Address", fields: {  } },
+    // { label: "Unique Identifier - Birth Cert", fields: {} },
+    // { label: "Driving Licence Number", fields: { } },
   ];
+
+  selectedSources.forEach((source) => {
+    const index = searchResults.findIndex(item => item.source === source);
+    const searchResult = searchResults[index];
+    if (searchResult.matches) {
+      searchResult.matches.forEach((match) => {
+        const index1 = data.findIndex(item => item.label === match.first);
+        if (index1 === -1) {
+          data.push({ label: match.first, fields: {[source]: match.second === 'YES' ? "✔" : match.second === 'NO' ? <strong>X</strong> : match.second } });
+        } else {  
+          data[index1].fields[source] =  match.second === 'YES' ? "✔" : match.second === 'NO' ? <strong>X</strong> : match.second;
+        }
+      // data.forEach((row) => {
+      //   searchResult
+      //   row.fields[source] = searchResults[index].complete ? searchResults[index].firstNameMatched == "YES" ? "✔" : "X" : "Waiting...";
+      // });
+    });
+  }
+  });
+  selectedSources.forEach((source) => {
+    data.forEach((row) => {
+      if (!row.fields[source]) {
+        row.fields[source] = "Waiting...";
+      }
+    });
+  });
+  // searchResults.forEach((result) => {   
+  //   data.forEach((row) => {
+  //     row.fields[result.source] = result.match[row.label];
+  //   });
+  // });
 
   return (
     <div className="govuk-width-container">
@@ -26,21 +57,27 @@ const CompareResults = ({ selectedSources }) => {
           <thead className="govuk-table__head">
             <tr className="govuk-table__row">
               <th scope="col" className="govuk-table__header">Search Filters</th>
-              {selectedSources.includes('LEV') && <th scope="col" className="govuk-table__header">LEV - Birth</th>}
-              {selectedSources.includes('IPCS') && <th scope="col" className="govuk-table__header">IPCS</th>}
-              {selectedSources.includes('DVLA') && <th scope="col" className="govuk-table__header">DVLA</th>}
+              {searchResults.map((result) => (
+                <th key={result.source} scope="col" className="govuk-table__header">
+                  {result.source === 'LEV' ? 'LEV - Birth' : result.source}
+                </th>
+              ))}
             </tr>
+
           </thead>
           <tbody className="govuk-table__body">
             {data.map((row, index) => (
               <tr className="govuk-table__row" key={index}>
                 <th scope="row" className="govuk-table__header">{row.label}</th>
-                {selectedSources.includes('LEV') && <td className="govuk-table__cell">{row.lev}</td>}
-                {selectedSources.includes('IPCS') && <td className="govuk-table__cell">{row.ipcs}</td>}
-                {selectedSources.includes('DVLA') && <td className="govuk-table__cell">{row.dvla}</td>}
+                {selectedSources.map((source) =>
+                  selectedSources.includes(source) && (
+                    <td className="govuk-table__cell" key={source}>{row.fields[source]}</td>
+                  )
+                )}
               </tr>
             ))}
           </tbody>
+
         </table>
       </main>
     </div>
