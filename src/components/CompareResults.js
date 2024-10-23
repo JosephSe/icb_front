@@ -18,9 +18,9 @@ const CompareResults = ({ searchResults, selectedSources }) => {
       searchResult.matches.forEach((match) => {
         const index1 = data.findIndex(item => item.label === match.first);
         if (index1 === -1) {
-          data.push({ label: match.first, fields: {[source]: match.second} });
+          data.push({ label: match.first, fields: {[source]: match.second === 'YES' ? "✔" : match.second === 'NO' ? "X" : match.second } });
         } else {  
-          data[index1].fields[source] = match.second;
+          data[index1].fields[source] =  match.second === 'YES' ? "✔" : match.second === 'NO' ? "X" : match.second;
         }
       // data.forEach((row) => {
       //   searchResult

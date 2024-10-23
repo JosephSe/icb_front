@@ -35,7 +35,6 @@ const SearchInProgress = () => {
       stompClient.subscribe('/session/topic/results', (greeting) => {
           const result = JSON.parse(greeting.body);
           const searchResult = new SearchResult(result.searchSource, result.searchComplete, result.match.matches, result.match.verifications);
-          console.log('Received: ', result.match.matches);
           setSearchResults(prevResults => {
             const index = prevResults.findIndex(item => item.source === result.searchSource);
             if (index !== -1) {
@@ -46,10 +45,10 @@ const SearchInProgress = () => {
             }
           })
       });
-      console.log('results ->>>', searchResults);
+      const jsonString = `{"searchSources":${JSON.stringify(selectedArray)}, "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}`
       stompClient.publish({
         destination: "/app/search",
-        body: '{"searchSources":["DVLA"], "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}'
+        body: jsonString
       });  
     };
     stompClient.activate();
