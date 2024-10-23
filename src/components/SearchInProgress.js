@@ -86,7 +86,7 @@ const SearchInProgress = () => {
       </fieldset>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-        {searchResults.map((result) => (
+        {searchResults.map((result, index) => (
           <div className="tile" key={result.source}>
             <div className="tile-content">
               <h2 className="govuk-heading-m">{result.source === 'LEV' ? 'LEV - BIRTH' : result.source}</h2>
@@ -98,6 +98,11 @@ const SearchInProgress = () => {
               ) : (
                 <>
                   <Paragraph>Search Complete</Paragraph>
+                  <div key={index}>
+                    {result.verifications && result.verifications.map((verification, idx) => (
+                      <Paragraph>{verification}</Paragraph>
+                    ))}
+                  </div>
                   <Paragraph>{result.verifications}</Paragraph>
                 </>
               )}
