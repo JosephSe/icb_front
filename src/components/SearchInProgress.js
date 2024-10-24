@@ -71,7 +71,9 @@ const SearchInProgress = () => {
         </legend>
       </fieldset>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
+      <div style={{display: 'flex', 
+    justifyContent: searchResults.length === 2 ? 'space-around' : 'space-between', 
+    gap: searchResults.length === 2 ? '0px' : '20px', gap: '20px', marginBottom: '20px' }}>
         {searchResults.map((result) => (
           <div className="tile" key={result.source}>
             <div className="tile-content">
