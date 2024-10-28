@@ -3,9 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Checkbox from '@govuk-react/checkbox';
 import { Button, ErrorText } from 'govuk-react';
 import SearchFilter from '../models/SearchFilter'; // Import SearchFilter model
-import UniqueId from '../models/UniqueID'; // Import UniqueId model
-import BioDetails from '../models/BioDetails'; // Import BioDetails model
-import Address from '../models/Address'; // Import Address model
 
 const SearchSourceChoices = () => {
   const navigate = useNavigate();
@@ -18,16 +15,72 @@ const SearchSourceChoices = () => {
     hmrc: false,
   });
 
-  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [errorMessage, setErrorMessage] = useState('');
+  const [levData, setLevData] = useState({
+    birthCertNumber: '',
+    firstName: '',
+    lastName: '',
+    dateOfBirth: { day: '', month: '', year: '' },
+  });
 
+  const [dvlaData, setDvlaData] = useState({
+    drivingLicenceNumber: '',
+  });
+
+  // Handle checkbox changes
   const handleCheckboxChange = (event) => {
+    const { id, checked } = event.target;
     setSelectedSources({
       ...selectedSources,
-      [event.target.id]: event.target.checked,
+      [id]: checked,
     });
   };
 
+  // Handle input changes for LEV fields
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    setLevData({
+      ...levData,
+      [id]: value,
+    });
+  };
+
+  // Handle input change for DVLA field
+  const handleDvlaInputChange = (event) => {
+    const { id, value } = event.target;
+    setDvlaData({
+      ...dvlaData,
+      [id]: value,
+    });
+  };
+
+  const handleDobChange = (event) => {
+    const { name, value } = event.target;
+    setLevData({
+      ...levData,
+      dateOfBirth: {
+        ...levData.dateOfBirth,
+        [name]: value,
+      },
+    });
+  };
+
+  const validateFields = () => {
+    if (selectedSources.levBirth) {
+      const { firstName, lastName } = levData;
+      if (!firstName || !lastName) {
+        setErrorMessage('First Name and Last Name are mandatory for LEV Birth.');
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleContinue = () => {
+    if (!validateFields()) {
+      return;
+    }
+
     const filteredSources = [];
 
     if (selectedSources.levBirth) filteredSources.push('LEV');
@@ -35,19 +88,17 @@ const SearchSourceChoices = () => {
     if (selectedSources.ipcs) filteredSources.push('IPCS');
 
     if (filteredSources.length === 0) {
-      // Set error message if no checkboxes are selected
-      setErrorMessage("Please select at least one search source.");
+      setErrorMessage('Please select at least one search source.');
       return;
     }
 
-    // Clear the error message and proceed
     setErrorMessage('');
 
-    // Create an instance of SearchFilter
-    const searchFilter = new SearchFilter(filteredSources);
+    // Create an instance of SearchFilter and pass data
+    const searchFilter = new SearchFilter(filteredSources, levData, dvlaData);
 
-    // Navigate to the next page with selected sources
-    navigate('/search-filters', { state: { selectedSources: searchFilter } });
+    // Navigate to the 'Search in Progress' page
+    navigate('/search-in-progress', { state: { selectedFilter: searchFilter } });
   };
 
   return (
@@ -60,8 +111,7 @@ const SearchSourceChoices = () => {
           <div id="verification-hint" className="govuk-hint">
             Choose from the following search sources
           </div>
-          
-          {/* Display error message if present */}
+
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
 
           <div className="govuk-checkboxes" data-module="govuk-checkboxes">
@@ -107,10 +157,125 @@ const SearchSourceChoices = () => {
           </div>
         </fieldset>
       </div>
-      <div className="button-container">
-        <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
-        <Button onClick={handleContinue} className="govuk-button">Continue</Button>
-      </div>
+
+      {/* Conditionally render LEV form fields when the LEV checkbox is selected */}
+      {selectedSources.levBirth && (
+        <div className="govuk-form-group">
+          <h2 className="govuk-heading-m">LEV - Birth Details</h2>
+
+          <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
+            <label htmlFor="birthCertNumber" className="govuk-label">Birth Certificate Number</label>
+            <input
+              type="text"
+              id="birthCertNumber"
+              className="govuk-input"
+              placeholder="Enter birth certificate number"
+              value={levData.birthCertNumber}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
+          <h2 className="govuk-heading-m">Biographic Details</h2>
+            <label htmlFor="firstName" className="govuk-label">First Name <span className="govuk-required">* </span></label>
+            <input
+              type="text"
+              id="firstName"
+              className="govuk-input"
+              placeholder="Enter first name"
+              value={levData.firstName}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
+            <label htmlFor="lastName" className="govuk-label">Last Name <span className="govuk-required">* </span></label>
+            <input
+              type="text"
+              id="lastName"
+              className="govuk-input"
+              placeholder="Enter last name"
+              value={levData.lastName}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <fieldset className="govuk-fieldset" style={{ marginBottom: '30px' }}>
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">Date of Birth</legend>
+            <div id="dob-hint" className="govuk-hint">
+              For example, 31 3 1980
+            </div>
+            <div className="govuk-date-input">
+              <div className="govuk-date-input__item" style={{ marginRight: '10px' }}>
+                <div className="govuk-form-group">
+                  <label className="govuk-label" htmlFor="dob-day">Day</label>
+                  <input
+                    className="govuk-input govuk-date-input__input govuk-input--width-2"
+                    id="dob-day"
+                    name="day"
+                    type="text"
+                    value={levData.dateOfBirth.day}
+                    onChange={handleDobChange}
+                  />
+                </div>
+              </div>
+              <div className="govuk-date-input__item" style={{ marginRight: '10px' }}>
+                <div className="govuk-form-group">
+                  <label className="govuk-label" htmlFor="dob-month">Month</label>
+                  <input
+                    className="govuk-input govuk-date-input__input govuk-input--width-2"
+                    id="dob-month"
+                    name="month"
+                    type="text"
+                    value={levData.dateOfBirth.month}
+                    onChange={handleDobChange}
+                  />
+                </div>
+              </div>
+              <div className="govuk-date-input__item">
+                <div className="govuk-form-group">
+                  <label className="govuk-label" htmlFor="dob-year">Year</label>
+                  <input
+                    className="govuk-input govuk-date-input__input govuk-input--width-4"
+                    id="dob-year"
+                    name="year"
+                    type="text"
+                    value={levData.dateOfBirth.year}
+                    onChange={handleDobChange}
+                  />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      )}
+
+      {/* Conditionally render DVLA form fields when the DVLA checkbox is selected */}
+      {selectedSources.dvla && (
+        <div className="govuk-form-group">
+          <h2 className="govuk-heading-m">DVLA Details</h2>
+          <label htmlFor="did" className="govuk-label">Driving Licence Number:</label>
+          <input
+            type="text"
+            id="did"
+            className="govuk-input"
+            placeholder="Enter identifier"
+            value={dvlaData.drivingLicenceNumber}
+            onChange={handleDvlaInputChange}
+          />
+        </div>
+      )}
+ <div className="button-container">
+<Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
+            <Button
+              onClick={handleContinue}
+              className="govuk-button"  // Disable button until first and last name are filled
+            >
+              Continue
+            </Button>
+            </div>
     </div>
   );
 };
