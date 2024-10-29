@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Checkbox from '@govuk-react/checkbox';
 import { Button, ErrorText } from 'govuk-react';
 import SearchFilter from '../models/SearchFilter'; // Import SearchFilter model
+import BioDetails from '../models/BioDetails';
+import Address from '../models/Address';
+import UniqueId from '../models/UniqueID';
 
 const SearchSourceChoices = () => {
   const navigate = useNavigate();
@@ -93,9 +96,17 @@ const SearchSourceChoices = () => {
     }
 
     setErrorMessage('');
-
+    const address=new Address();
+    const uniqueId=new UniqueId('LEV','BIRTH_CERTIFICATE',levData.birthCertNumber);
+    const dob = levData.dateOfBirth;
+const formattedDateOfBirth = `${dob.year}-${dob.month.padStart(2, '0')}-${dob.day.padStart(2, '0')}`;
+    const bioDetails=new BioDetails(levData.firstName,levData.lastName,'',formattedDateOfBirth);
     // Create an instance of SearchFilter and pass data
-    const searchFilter = new SearchFilter(filteredSources, levData, dvlaData);
+   // Wrap uniqueId in an array
+const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, address);
+
+
+    //const searchFilter = new SearchFilter(filteredSources, levData, dvlaData);
 
     // Navigate to the 'Search in Progress' page
     navigate('/search-in-progress', { state: { selectedFilter: searchFilter } });

@@ -8,6 +8,9 @@ import {Client} from '@stomp/stompjs'
 const SearchInProgress = () => {
   const location = useLocation();
   const searchFilter = location.state?.selectedFilter;
+  const uniqueId=searchFilter?.uniqueId|| [];
+  const bioDetails=searchFilter?.bioDetails;
+  
 
   // Extract selected sources for easy access
   const selectedArray = searchFilter?.searchSources || [];
@@ -45,7 +48,9 @@ const SearchInProgress = () => {
             }
           })
       });
-      const jsonString = `{"searchSources":${JSON.stringify(selectedArray)}, "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}`
+      //const jsonString = `{"searchSources":${JSON.stringify(selectedArray)}, "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}`
+      const jsonString=JSON.stringify(searchFilter);
+      console.log(jsonString);
       stompClient.publish({
         destination: "/app/search",
         body: jsonString
