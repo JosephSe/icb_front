@@ -252,21 +252,7 @@ const SearchSourceChoices = () => {
         </div>
       )}
 
-      {/* Conditionally render DVLA form fields when the DVLA checkbox is selected */}
-      {selectedSources.dvla && (
-        <div className="govuk-form-group">
-          <h2 className="govuk-heading-m">DVLA Details</h2>
-          <label htmlFor="did" className="govuk-label">Driving Licence Number:</label>
-          <input
-            type="text"
-            id="did"
-            className="govuk-input"
-            placeholder="Enter identifier"
-            value={dvlaData.drivingLicenceNumber}
-            onChange={handleDvlaInputChange}
-          />
-        </div>
-      )}
+      
  <div className="button-container">
 <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
             <Button
