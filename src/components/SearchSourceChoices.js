@@ -96,14 +96,17 @@ const SearchSourceChoices = () => {
     }
 
     setErrorMessage('');
-    const address=new Address();
-    const uniqueId=new UniqueId('LEV','BIRTH_CERTIFICATE',levData.birthCertNumber);
+    const address = new Address();
+    const uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', levData.birthCertNumber);
     const dob = levData.dateOfBirth;
-const formattedDateOfBirth = `${dob.year}-${dob.month.padStart(2, '0')}-${dob.day.padStart(2, '0')}`;
-    const bioDetails=new BioDetails(levData.firstName,levData.lastName,'',formattedDateOfBirth);
+    // Check if year, month, or day is missing, and set formattedDateOfBirth to an empty string if so
+    const formattedDateOfBirth = dob.year && dob.month && dob.day
+      ? `${dob.year}-${dob.month.padStart(2, '0')}-${dob.day.padStart(2, '0')}`
+      : '';
+    const bioDetails = new BioDetails(levData.firstName, levData.lastName, '', formattedDateOfBirth);
     // Create an instance of SearchFilter and pass data
-   // Wrap uniqueId in an array
-const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, address);
+    // Wrap uniqueId in an array
+    const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, address);
 
 
     //const searchFilter = new SearchFilter(filteredSources, levData, dvlaData);
@@ -187,7 +190,7 @@ const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, a
           </div>
 
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
-          <h2 className="govuk-heading-m">Biographic Details</h2>
+            <h2 className="govuk-heading-m">Biographic Details</h2>
             <label htmlFor="firstName" className="govuk-label">First Name <span className="govuk-required">* </span></label>
             <input
               type="text"
@@ -263,16 +266,16 @@ const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, a
         </div>
       )}
 
-      
- <div className="button-container">
-<Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
-            <Button
-              onClick={handleContinue}
-              className="govuk-button"  // Disable button until first and last name are filled
-            >
-              Continue
-            </Button>
-            </div>
+
+      <div className="button-container">
+        <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
+        <Button
+          onClick={handleContinue}
+          className="govuk-button"  // Disable button until first and last name are filled
+        >
+          Continue
+        </Button>
+      </div>
     </div>
   );
 };
