@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Checkbox from '@govuk-react/checkbox';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { Button, ErrorText } from 'govuk-react';
 import SearchFilter from '../models/SearchFilter'; // Import SearchFilter model
 import BioDetails from '../models/BioDetails';
@@ -8,22 +7,37 @@ import Address from '../models/Address';
 import UniqueId from '../models/UniqueID';
 
 const SearchSourceChoices = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const searchFilter = location.state?.selectedFilter;
+  if (!searchFilter) {
+    console.warn("SearchFilter is undefined or not passed correctly.");
+ } else {
+    console.log("Passed values SearchFilter:", searchFilter);
+ }
+
+ 
+  
+  // Initialize states with data from searchFilter if it exists
   const [selectedSources, setSelectedSources] = useState({
-    levBirth: false,
+    levBirth: searchFilter?.searchSources.includes('LEV') || false,
     levMarriage: false,
     levDeath: false,
-    dvla: false,
-    ipcs: false,
+    dvla: searchFilter?.searchSources.includes('DVLA') || false,
+    ipcs: searchFilter?.searchSources.includes('IPCS') || false,
     hmrc: false,
   });
-
+  const filteredSources = [];
   const [errorMessage, setErrorMessage] = useState('');
   const [levData, setLevData] = useState({
-    birthCertNumber: '',
-    firstName: '',
-    lastName: '',
-    dateOfBirth: { day: '', month: '', year: '' },
+    birthCertNumber: searchFilter?.searchIDTypes [0]?.idValue ||'',
+    firstName: searchFilter?.searchBioDetails?.firstName || '',
+    lastName: searchFilter?.searchBioDetails?.lastName || '',
+    dateOfBirth: {
+      day: searchFilter?.searchBioDetails?.dateOfBirth?.split('-')[2] || '',
+      month: searchFilter?.searchBioDetails?.dateOfBirth?.split('-')[1] || '',
+      year: searchFilter?.searchBioDetails?.dateOfBirth?.split('-')[0] || '',
+    },
   });
 
   const [dvlaData, setDvlaData] = useState({
@@ -59,13 +73,13 @@ const SearchSourceChoices = () => {
 
   const handleDobChange = (event) => {
     const { name, value } = event.target;
-    setLevData({
-      ...levData,
+    setLevData((prevData) => ({
+      ...prevData,
       dateOfBirth: {
-        ...levData.dateOfBirth,
+        ...prevData.dateOfBirth,
         [name]: value,
       },
-    });
+    }));
   };
 
   const validateFields = () => {
@@ -78,14 +92,12 @@ const SearchSourceChoices = () => {
     }
     return true;
   };
-
+ 
   const handleContinue = () => {
     if (!validateFields()) {
       return;
     }
-
-    const filteredSources = [];
-
+    
     if (selectedSources.levBirth) filteredSources.push('LEV');
     if (selectedSources.dvla) filteredSources.push('DVLA');
     if (selectedSources.ipcs) filteredSources.push('IPCS');
@@ -136,6 +148,7 @@ const SearchSourceChoices = () => {
                 name="lifeEvent"
                 type="checkbox"
                 value="birth"
+                checked={selectedSources.levBirth}
                 onChange={handleCheckboxChange}
               />
               <label className="govuk-label govuk-checkboxes__label" htmlFor="levBirth">
@@ -149,6 +162,7 @@ const SearchSourceChoices = () => {
                 name="service"
                 type="checkbox"
                 value="dvla"
+                checked={selectedSources.dvla}
                 onChange={handleCheckboxChange}
               />
               <label className="govuk-label govuk-checkboxes__label" htmlFor="dvla">
@@ -162,6 +176,7 @@ const SearchSourceChoices = () => {
                 name="service"
                 type="checkbox"
                 value="ipcs"
+                checked={selectedSources.ipcs}
                 onChange={handleCheckboxChange}
               />
               <label className="govuk-label govuk-checkboxes__label" htmlFor="ipcs">
@@ -268,7 +283,7 @@ const SearchSourceChoices = () => {
 
 
       <div className="button-container">
-        <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
+      <Button onClick={() => window.location.href = '/'} className="govuk-button">Back</Button>
         <Button
           onClick={handleContinue}
           className="govuk-button"  // Disable button until first and last name are filled

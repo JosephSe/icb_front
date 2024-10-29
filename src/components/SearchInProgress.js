@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Paragraph } from 'govuk-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import CompareResults from './CompareResults';
 import SearchResult from '../models/SearchResult';
 import {Client} from '@stomp/stompjs'
 
 const SearchInProgress = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const searchFilter = location.state?.selectedFilter;
+  const handleBack = () => {
+    navigate('/search-source-choices', { state: { selectedFilter: searchFilter } });
+  };
   const uniqueId=searchFilter?.uniqueId|| [];
   const bioDetails=searchFilter?.bioDetails;
   
@@ -28,6 +32,7 @@ const SearchInProgress = () => {
       searchResults.push(searchResult);
     }
   });
+
 
   useEffect(() => {
     const stompClient = new Client({
@@ -128,7 +133,7 @@ const SearchInProgress = () => {
       )}
 
       <div className="button-container" style={{ marginTop: '20px' }}>
-        <Button onClick={() => window.history.back()} className="govuk-button">Back</Button>
+      <Button onClick={handleBack} className="govuk-button">Back</Button>
         <Button onClick={() => window.location.href = '/'} className="govuk-button">Home</Button>
       </div>
     </div>
