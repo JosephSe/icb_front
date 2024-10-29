@@ -113,7 +113,7 @@ const SearchInProgress = () => {
                 </>
               )}
             </div>
-            {!result.complete || result.status === 'No match found' ? (
+            {!result.complete || result.status !== 'One match found' ? (
               <Button className="tile-button" disabled>Stop</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
