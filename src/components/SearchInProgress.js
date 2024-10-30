@@ -118,9 +118,16 @@ const SearchInProgress = () => {
                 </>
               )}
             </div>
-            {!result.complete || result.status !== 'One match found' ? (
+            {!result.complete ? (
               <Button className="tile-button" disabled>Stop</Button>
-            ) : (
+            ) : 
+            result.status === 'No match found' ? (
+              <Button className="tile-button" style={{ display: 'none' }}>Stop</Button>
+            ) :
+            result.status === 'Multiple matches found' ? (
+              <Button className="tile-button" diabled>Compare Details</Button>
+            ) :
+            (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
           </div>
