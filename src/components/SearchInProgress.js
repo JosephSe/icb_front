@@ -42,7 +42,7 @@ const SearchInProgress = () => {
     stompClient.onConnect = (frame) => {
       stompClient.subscribe('/session/topic/results', (greeting) => {
           const result = JSON.parse(greeting.body);
-          const searchResult = new SearchResult(result.searchSource, result.searchComplete, result.match.matches, result.match.verifications);
+          const searchResult = new SearchResult(result.searchSource, result.searchComplete, result.matchStatus, result.match?.matches, result.match?.verifications);
           setSearchResults(prevResults => {
             const index = prevResults.findIndex(item => item.source === result.searchSource);
             if (index !== -1) {
@@ -108,6 +108,7 @@ const SearchInProgress = () => {
               ) : (
                 <>
                   <Paragraph>Search Complete</Paragraph>
+                  <Paragraph>{result.status}</Paragraph>
                   <div key={index}>
                     {result.verifications && result.verifications.map((verification, idx) => (
                       <Paragraph>{verification}</Paragraph>
@@ -117,7 +118,7 @@ const SearchInProgress = () => {
                 </>
               )}
             </div>
-            {!result.complete ? (
+            {!result.complete || result.status !== 'One match found' ? (
               <Button className="tile-button" disabled>Stop</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
