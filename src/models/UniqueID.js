@@ -1,5 +1,6 @@
 class UniqueId {
-    constructor(idType, idValue) {
+    constructor(searchSource,idType, idValue) {
+      this.searchSource=searchSource;
       this.idType = idType;  // e.g., passport, driving license, etc.
       this.idValue = idValue; // the actual unique ID value
     }

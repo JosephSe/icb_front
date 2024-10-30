@@ -5,8 +5,8 @@ import Address from './Address';
 class SearchFilter {
   constructor(searchSources, uniqueId, bioDetails, address) {
     this.searchSources = searchSources;  // Should be an array with LEV, DVLA, IPCS
-    this.uniqueId = uniqueId;  // an instance of UniqueId
-    this.bioDetails = bioDetails;  // an instance of BioDetails
+    this.searchIDTypes = uniqueId;  // an instance of UniqueId
+    this.searchBioDetails = bioDetails;  // an instance of BioDetails
     this.address = address;  // an instance of Address
 
     // Call the validation method after setting up the fields

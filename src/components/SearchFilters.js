@@ -151,8 +151,8 @@ const SearchFilters = () => {
             </div>
           </fieldset>
 
-          {/* Address Section */}
-          <fieldset className="govuk-fieldset">
+         
+          {/* <fieldset className="govuk-fieldset">
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h2 className="govuk-fieldset__heading">Address</h2>
             </legend>
@@ -172,7 +172,7 @@ const SearchFilters = () => {
               <label className="govuk-label" htmlFor="address-postcode">Postcode</label>
               <input className="govuk-input govuk-input--width-10" id="address-postcode" name="addressPostcode" type="text" placeholder="Postcode" autoComplete="postal-code" />
             </div>
-          </fieldset>
+          </fieldset> */}
 
           <div className="button-container">
             <Button onClick={() => navigate(-1)} className="govuk-button">Back</Button>
