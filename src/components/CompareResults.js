@@ -1,6 +1,8 @@
 import React from 'react';
 
 const CompareResults = ({ searchResults, selectedSources }) => {
+  
+  
   const data = [
     // { label: "First Name", fields: {  } },
     // { label: "Middle Name", fields: {  } },
@@ -14,6 +16,7 @@ const CompareResults = ({ searchResults, selectedSources }) => {
   selectedSources.forEach((source) => {
     const index = searchResults.findIndex(item => item.source === source);
     const searchResult = searchResults[index];
+    console.log("search results ", searchResult);
     if (searchResult.matches) {
       searchResult.matches.forEach((match) => {
         const index1 = data.findIndex(item => item.label === match.first);
