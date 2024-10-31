@@ -32,7 +32,14 @@ const SearchInProgress = () => {
     stompClient.onConnect = () => {
       stompClient.subscribe('/session/topic/results', (message) => {
         const result = JSON.parse(message.body);
-        const newSearchResult = new SearchResult(result.searchSource, result.searchComplete, result.matchStatus, result.match?.matches, result.match?.verifications);
+        const newSearchResult = new SearchResult(
+          result.searchSource,
+          result.searchComplete,
+          result.matchStatus,
+          result.match?.matches,
+          result.match?.verifications, 
+          result.multiMatches ? result.multiMatches : [] // This should be for multiMatches
+        );
 
         setSearchResults(prevResults => {
           const existingIndex = prevResults.findIndex(item => item.source === result.searchSource);
