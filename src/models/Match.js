@@ -1,11 +1,12 @@
 class Match{
-    constructor(firstName, middleName, lastName, dateOfBirth, address,uniqueId) {
+    constructor(firstName, middleName, lastName, dateOfBirth, address,birthCertificate,drivingLicenseNumber) {
       this.firstName = firstName;
       this.middleName = middleName;
       this.lastName = lastName;
       this.dateOfBirth = dateOfBirth
       this.address = address;
-      this.uniqueId = uniqueId;
+      this.birthCertificate=birthCertificate;
+      this.drivingLicenseNumber = drivingLicenseNumber;
     }
   }
   

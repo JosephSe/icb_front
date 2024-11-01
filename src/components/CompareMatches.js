@@ -1,12 +1,17 @@
 import React from 'react';
 
 const CompareMatches = ({ stompClient, searchResults }) => {
-    const columns = ["First Name","Middle Name","Last Name", "Birthdate", "Address", ""];
+
 
     const searchResult = searchResults[0];
     const multiMatches = searchResult.multiMatches || [];
-    console.log("search results ", searchResult.multiMatches);
-
+    console.log("search results ", searchResult);
+    const columns = ["First Name", "Middle Name", "Last Name", "Birthdate", "Address", ""];
+    if (searchResult.source === "LEV") {
+        columns.splice(5, 0, "Birth Certificate Number"); // Add at the 5th index
+    } else if (searchResult.source === "DVLA") {
+        columns.splice(5, 0, "Driving Licence Number"); // Add at the 5th index
+    }
     const handleSelect = (index) => {
         console.log(`Row ${index + 1} selected`);
         const selectedData = searchResults[index];
@@ -38,15 +43,16 @@ const CompareMatches = ({ stompClient, searchResults }) => {
                         {multiMatches.map((row, index) => (
                             <tr className="govuk-table__row" key={index}>
                                 <td className="govuk-table__cell">{row.firstName || 'N/A'}</td>
-                                
                                 <td className="govuk-table__cell">{row.middleName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.lastName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.dateOfBirth || 'N/A'}</td>
-                                <td className="govuk-table__cell">
-                                    {row.address
-                                        ? row.address.replace(/^"|"$|\\\"/g, '').replace(/(.*?)(\s+)(.*?)(\s+)(.*)/, '$1, $3, $5')
-                                        : 'N/A'}
-                                </td>
+                                <td className="govuk-table__cell">{row.address || 'N/A'}</td>
+                                {searchResult.source === "LEV" && (
+                                    <td className="govuk-table__cell">{row.birthCertificate || 'N/A'}</td>
+                                )}
+                                {searchResult.source === "DVLA" && (
+                                    <td className="govuk-table__cell">{row.drivingLicenseNumber || 'N/A'}</td>
+                                )}
                                 <td className="govuk-table__cell">
                                     <button onClick={() => handleSelect(index)} className="govuk-button">
                                         Select

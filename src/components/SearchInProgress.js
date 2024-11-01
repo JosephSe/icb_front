@@ -37,9 +37,12 @@ const SearchInProgress = () => {
           result.searchComplete,
           result.matchStatus,
           result.match?.matches,
-          result.match?.verifications, 
-          result.multiMatches ? result.multiMatches : [] // This should be for multiMatches
+          result.match?.verifications,
+          result.multiMatches || [], // MultiMatches array, default to empty if not provided
+          result.birthCertificate ? result.birthCertificate : undefined,
+          result.drivingLicenseNumber ? result.drivingLicenseNumber : undefined
         );
+        
 
         setSearchResults(prevResults => {
           const existingIndex = prevResults.findIndex(item => item.source === result.searchSource);
