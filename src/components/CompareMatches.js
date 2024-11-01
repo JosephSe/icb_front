@@ -1,21 +1,48 @@
 import React from 'react';
+import SearchFilter from '../models/SearchFilter';
+import BioDetails from '../models/BioDetails';
+import { useNavigate } from 'react-router-dom';
+import UniqueId from '../models/UniqueID';
+import SearchResult from '../models/SearchResult';
 
-const CompareMatches = ({ stompClient, searchResults }) => {
-
-
+const CompareMatches = ({ searchResults, stompClient, updateSearchResults, setShowCompareMatches }) => {
+    const navigate = useNavigate();
     const searchResult = searchResults[0];
     const multiMatches = searchResult.multiMatches || [];
-    console.log("search results ", searchResult);
     const columns = ["First Name", "Middle Name", "Last Name", "Birthdate", "Address", ""];
+
     if (searchResult.source === "LEV") {
-        columns.splice(5, 0, "Birth Certificate Number"); // Add at the 5th index
+        columns.splice(5, 0, "Birth Certificate Number");
     } else if (searchResult.source === "DVLA") {
-        columns.splice(5, 0, "Driving Licence Number"); // Add at the 5th index
+        columns.splice(5, 0, "Driving Licence Number");
     }
+
     const handleSelect = (index) => {
         console.log(`Row ${index + 1} selected`);
-        const selectedData = searchResults[index];
-        console.log("Selected data:", selectedData);
+        const selectedData = multiMatches[index];
+        const filteredSources = [searchResult.source];
+        const uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', selectedData.birthCertificate);
+        const bioDetails = new BioDetails(selectedData.firstName, selectedData.lastName, '', selectedData.dateOfBirth);
+
+        const newSearchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, selectedData.address);
+        console.log("New Search filter:", newSearchFilter);
+        // Reset LEV search result to "searching" state
+        updateSearchResults([new SearchResult(searchResult.source, false)]);
+        if (stompClient.connected) {
+
+            const jsonString = JSON.stringify(newSearchFilter);
+            console.log("JSON is :", jsonString);
+            stompClient.publish({
+                destination: "/app/search",
+                body: jsonString
+            });
+            
+            //
+            setShowCompareMatches(false);
+            // Hide the CompareMatches table after selection
+        } else {
+            console.error("STOMP client is not connected. Unable to publish.");
+        }
     };
 
     return (
@@ -32,10 +59,8 @@ const CompareMatches = ({ stompClient, searchResults }) => {
                 <table className="govuk-table">
                     <thead className="govuk-table__head">
                         <tr className="govuk-table__row">
-                            {columns.map((col, index) => (
-                                <th key={index} scope="col" className="govuk-table__header">
-                                    {col}
-                                </th>
+                            {columns.map((col, idx) => (
+                                <th key={idx} className="govuk-table__header">{col}</th>
                             ))}
                         </tr>
                     </thead>
@@ -46,7 +71,12 @@ const CompareMatches = ({ stompClient, searchResults }) => {
                                 <td className="govuk-table__cell">{row.middleName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.lastName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.dateOfBirth || 'N/A'}</td>
-                                <td className="govuk-table__cell">{row.address || 'N/A'}</td>
+                                <td className="govuk-table__cell">
+                                    {row.address
+                                        ? row.address.replace(/^"|"$|\\\"/g, '').replace(/(.*?)(\s+)(.*?)(\s+)(.*)/, '$1, $3, $5')
+                                        : 'N/A'}
+                                </td>
+
                                 {searchResult.source === "LEV" && (
                                     <td className="govuk-table__cell">{row.birthCertificate || 'N/A'}</td>
                                 )}
@@ -54,15 +84,11 @@ const CompareMatches = ({ stompClient, searchResults }) => {
                                     <td className="govuk-table__cell">{row.drivingLicenseNumber || 'N/A'}</td>
                                 )}
                                 <td className="govuk-table__cell">
-                                    <button onClick={() => handleSelect(index)} className="govuk-button">
-                                        Select
-                                    </button>
+                                    <button className="govuk-button" onClick={() => handleSelect(index)}>Select</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
-
-
                 </table>
             </main>
         </div>

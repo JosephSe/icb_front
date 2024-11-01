@@ -108,7 +108,6 @@ const SearchSourceChoices = () => {
     }
 
     setErrorMessage('');
-    const address = new Address();
     const uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', levData.birthCertNumber);
     const dob = levData.dateOfBirth;
     // Check if year, month, or day is missing, and set formattedDateOfBirth to an empty string if so
@@ -118,7 +117,7 @@ const SearchSourceChoices = () => {
     const bioDetails = new BioDetails(levData.firstName, levData.lastName, '', formattedDateOfBirth);
     // Create an instance of SearchFilter and pass data
     // Wrap uniqueId in an array
-    const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, address);
+    const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, "");
 
 
     //const searchFilter = new SearchFilter(filteredSources, levData, dvlaData);

@@ -17,13 +17,16 @@ const SearchInProgress = () => {
   const [showCompareResults, setShowCompareResults] = useState(false);
   const [showCompareMatches, setShowCompareMatches] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [stompClient, setStompClient] = useState(null);
 
-  const stompClient = new Client({
-    brokerURL: 'ws://localhost:8080/ws'
-  });
+ 
 
   useEffect(() => {
     // Initialize the searchResults with selected sources if empty
+    const stompClient = new Client({
+      brokerURL: 'ws://localhost:8080/ws'
+    });
+    setStompClient(stompClient)
     if (searchResults.length === 0) {
       const initialResults = selectedArray.map(source => new SearchResult(source, false));
       setSearchResults(initialResults);
@@ -70,9 +73,15 @@ const SearchInProgress = () => {
     return () => {
       if (stompClient.connected) {
         stompClient.deactivate();
+        console.log('Disconnected');
       }
     };
-  }, [selectedArray, searchFilter, searchResults.length]);
+  }, []);
+
+    // Callback function to update searchResults
+    const updateSearchResults = (updatedResults) => {
+      setSearchResults(updatedResults);
+    };
 
   const handleViewDetails = () => {
     setShowCompareResults(true);
@@ -81,7 +90,7 @@ const SearchInProgress = () => {
   const handleCompareMatches = () => {
     setShowCompareMatches(true);
   };
-
+  
   return (
     <div className="govuk-width-container">
       <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
@@ -131,7 +140,8 @@ const SearchInProgress = () => {
       )}
       {showCompareMatches && (
         <div id="compare-matches-section" style={{ marginTop: '20px' }}>
-          <CompareMatches searchResults={searchResults} stompClient={stompClient}/>
+          <CompareMatches searchResults={searchResults} stompClient={stompClient} updateSearchResults={updateSearchResults} 
+        setShowCompareMatches={setShowCompareMatches}/>
         </div>
       )}
 
