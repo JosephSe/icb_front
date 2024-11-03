@@ -16,7 +16,6 @@ const CompareResults = ({ searchResults, selectedSources }) => {
   selectedSources.forEach((source) => {
     const index = searchResults.findIndex(item => item.source === source);
     const searchResult = searchResults[index];
-    console.log("search results ", searchResult);
     if (searchResult.matches) {
       searchResult.matches.forEach((match) => {
         const index1 = data.findIndex(item => item.label === match.first);
@@ -33,9 +32,17 @@ const CompareResults = ({ searchResults, selectedSources }) => {
   }
   });
   selectedSources.forEach((source) => {
+    const index = searchResults.findIndex(item => item.source === source);
+    const searchResult = searchResults[index];
+    let status = 'Waiting...';
+    if (searchResult.status === 'No match found') {
+      status = 'N/A';
+    } else if (searchResult.status === 'Multiple matches found') {
+      status = 'Resolve...';
+    }
     data.forEach((row) => {
       if (!row.fields[source]) {
-        row.fields[source] = "Waiting...";
+        row.fields[source] = status;
       }
     });
   });

@@ -17,6 +17,7 @@ const SearchInProgress = () => {
   const [showCompareResults, setShowCompareResults] = useState(false);
   const [showCompareMatches, setShowCompareMatches] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [multiMatchResult, setMultiMatchResult] = useState([]);
   const [stompClient, setStompClient] = useState(null);
 
  
@@ -78,17 +79,22 @@ const SearchInProgress = () => {
     };
   }, []);
 
-    // Callback function to update searchResults
-    const updateSearchResults = (updatedResults) => {
-      setSearchResults(updatedResults);
-    };
+  // Callback function to update searchResults
+  const updateSearchResults = (resetSearch) => {
+    const existingIndex = searchResults.findIndex(item => item.source === resetSearch.source);
+    // Update existing entry
+    const updatedResults = [...searchResults];
+    updatedResults[existingIndex] = resetSearch;
+    setSearchResults(updatedResults);
+  };
 
   const handleViewDetails = () => {
     setShowCompareResults(true);
   };
 
-  const handleCompareMatches = () => {
+  const handleCompareMatches = (searchResult) => {
     setShowCompareMatches(true);
+    setMultiMatchResult(searchResult);
   };
   
   return (
@@ -124,7 +130,7 @@ const SearchInProgress = () => {
             ) : result.status === 'No match found' ? (
               <Button className="tile-button" style={{ display: 'none' }}>Stop</Button>
             ) : result.status === 'Multiple matches found' ? (
-              <Button className="tile-button" onClick={handleCompareMatches}>Compare Details</Button>
+              <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Compare Details</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
@@ -140,7 +146,7 @@ const SearchInProgress = () => {
       )}
       {showCompareMatches && (
         <div id="compare-matches-section" style={{ marginTop: '20px' }}>
-          <CompareMatches searchResults={searchResults} stompClient={stompClient} updateSearchResults={updateSearchResults} 
+          <CompareMatches multiMatchResult={multiMatchResult} stompClient={stompClient} updateSearchResults={updateSearchResults} 
         setShowCompareMatches={setShowCompareMatches}/>
         </div>
       )}

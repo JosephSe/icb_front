@@ -5,29 +5,33 @@ import { useNavigate } from 'react-router-dom';
 import UniqueId from '../models/UniqueID';
 import SearchResult from '../models/SearchResult';
 
-const CompareMatches = ({ searchResults, stompClient, updateSearchResults, setShowCompareMatches }) => {
+const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, setShowCompareMatches }) => {
     const navigate = useNavigate();
-    const searchResult = searchResults[0];
-    const multiMatches = searchResult.multiMatches || [];
+    const multiMatches = multiMatchResult.multiMatches || [];
     const columns = ["First Name", "Middle Name", "Last Name", "Birthdate", "Address", ""];
 
-    if (searchResult.source === "LEV") {
+    if (multiMatchResult.source === "LEV") {
         columns.splice(5, 0, "Birth Certificate Number");
-    } else if (searchResult.source === "DVLA") {
+    } else if (multiMatchResult.source === "DVLA") {
         columns.splice(5, 0, "Driving Licence Number");
     }
 
     const handleSelect = (index) => {
         console.log(`Row ${index + 1} selected`);
         const selectedData = multiMatches[index];
-        const filteredSources = [searchResult.source];
-        const uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', selectedData.birthCertificate);
+        const filteredSources = [multiMatchResult.source];
+        let uniqueId = new UniqueId();
+        if (multiMatchResult.source === 'LEV') {
+          uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', selectedData.birthCertificate);
+        } else {
+          uniqueId = new UniqueId('DVLA', 'DRIVER_LICENSE', selectedData.drivingLicenseNumber);
+        }
         const bioDetails = new BioDetails(selectedData.firstName, selectedData.lastName, '', selectedData.dateOfBirth);
 
         const newSearchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, selectedData.address);
         console.log("New Search filter:", newSearchFilter);
         // Reset LEV search result to "searching" state
-        updateSearchResults([new SearchResult(searchResult.source, false)]);
+        updateSearchResults(new SearchResult(multiMatchResult.source, false));
         if (stompClient.connected) {
 
             const jsonString = JSON.stringify(newSearchFilter);
@@ -77,10 +81,10 @@ const CompareMatches = ({ searchResults, stompClient, updateSearchResults, setSh
                                         : 'N/A'}
                                 </td>
 
-                                {searchResult.source === "LEV" && (
+                                {multiMatchResult.source === "LEV" && (
                                     <td className="govuk-table__cell">{row.birthCertificate || 'N/A'}</td>
                                 )}
-                                {searchResult.source === "DVLA" && (
+                                {multiMatchResult.source === "DVLA" && (
                                     <td className="govuk-table__cell">{row.drivingLicenseNumber || 'N/A'}</td>
                                 )}
                                 <td className="govuk-table__cell">
