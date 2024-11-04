@@ -41,9 +41,7 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                 body: jsonString
             });
             
-            //
             setShowCompareMatches(false);
-            // Hide the CompareMatches table after selection
         } else {
             console.error("STOMP client is not connected. Unable to publish.");
         }
