@@ -346,7 +346,7 @@ const SearchSourceChoices = () => {
             />
           </div>
           <div className="govuk-form-group">
-            <label htmlFor="line2" className="govuk-label">City</label>
+            <label htmlFor="line2" className="govuk-label">Line 2</label>
             <input
               type="text"
               id="line2"
