@@ -369,7 +369,7 @@ const SearchSourceChoices = () => {
           </div>
 
           <div className="govuk-form-group">
-            <label htmlFor="postalCode" className="govuk-label">Post Code</label>
+            <label htmlFor="postalCode" className="govuk-label">Postcode</label>
             <input
               type="text"
               id="postCode"
