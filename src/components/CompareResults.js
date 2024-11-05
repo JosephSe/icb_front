@@ -1,6 +1,8 @@
 import React from 'react';
 
 const CompareResults = ({ searchResults, selectedSources }) => {
+  
+  
   const data = [
     // { label: "First Name", fields: {  } },
     // { label: "Middle Name", fields: {  } },
@@ -30,9 +32,17 @@ const CompareResults = ({ searchResults, selectedSources }) => {
   }
   });
   selectedSources.forEach((source) => {
+    const index = searchResults.findIndex(item => item.source === source);
+    const searchResult = searchResults[index];
+    let status = 'Waiting...';
+    if (searchResult.status === 'No match found') {
+      status = 'N/A';
+    } else if (searchResult.status === 'Multiple matches found') {
+      status = 'Resolve...';
+    }
     data.forEach((row) => {
       if (!row.fields[source]) {
-        row.fields[source] = "Waiting...";
+        row.fields[source] = status;
       }
     });
   });

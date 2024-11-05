@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Paragraph } from 'govuk-react';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CompareResults from './CompareResults';
+import CompareMatches from './CompareMatches';
 import SearchResult from '../models/SearchResult';
-import {Client} from '@stomp/stompjs'
+import { Client } from '@stomp/stompjs';
 
 const SearchInProgress = () => {
   const navigate = useNavigate();
@@ -12,68 +13,64 @@ const SearchInProgress = () => {
   const handleBack = () => {
     navigate('/search-source-choices', { state: { selectedFilter: searchFilter } });
   };
-  const uniqueId=searchFilter?.uniqueId|| [];
-  const bioDetails=searchFilter?.bioDetails;
-  
-
-  // Extract selected sources for easy access
   const selectedArray = searchFilter?.searchSources || [];
   const [showCompareResults, setShowCompareResults] = useState(false);
-  const [selectedSources, setSelectedSources] = useState(selectedArray);
+  const [showCompareMatches, setShowCompareMatches] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
-  
-  selectedArray.forEach(source => {
-    const index = searchResults.findIndex(item => item.source === source);
-    if (index === -1) {
-      const searchResult = new SearchResult(
-        source,
-        false
-      );
-      searchResults.push(searchResult);
-    }
-  });
+  const [multiMatchResult, setMultiMatchResult] = useState([]);
+  const [stompClient, setStompClient] = useState(null);
 
+ 
 
   useEffect(() => {
+    // Initialize the searchResults with selected sources if empty
     const stompClient = new Client({
       brokerURL: 'ws://localhost:8080/ws'
     });
-  
-    stompClient.onConnect = (frame) => {
-      stompClient.subscribe('/session/topic/results', (greeting) => {
-          const result = JSON.parse(greeting.body);
-          const searchResult = new SearchResult(result.searchSource, result.searchComplete, result.matchStatus, result.match?.matches, result.match?.verifications);
-          setSearchResults(prevResults => {
-            const index = prevResults.findIndex(item => item.source === result.searchSource);
-            if (index !== -1) {
-              prevResults[index] = searchResult;
-              return [...prevResults];
-            } else {
-              return [...prevResults, searchResult];
-            }
-          })
+    setStompClient(stompClient)
+    if (searchResults.length === 0) {
+      const initialResults = selectedArray.map(source => new SearchResult(source, false));
+      setSearchResults(initialResults);
+    }
+
+    stompClient.onConnect = () => {
+      stompClient.subscribe('/session/topic/results', (message) => {
+        const result = JSON.parse(message.body);
+        const newSearchResult = new SearchResult(
+          result.searchSource,
+          result.searchComplete,
+          result.matchStatus,
+          result.match?.matches,
+          result.match?.verifications,
+          result.multiMatches || [], // MultiMatches array, default to empty if not provided
+          result.birthCertificate ? result.birthCertificate : undefined,
+          result.drivingLicenseNumber ? result.drivingLicenseNumber : undefined
+        );
+        
+
+        setSearchResults(prevResults => {
+          const existingIndex = prevResults.findIndex(item => item.source === result.searchSource);
+          if (existingIndex !== -1) {
+            // Update existing entry
+            const updatedResults = [...prevResults];
+            updatedResults[existingIndex] = newSearchResult;
+            return updatedResults;
+          } else {
+            // Add new entry
+            return [...prevResults, newSearchResult];
+          }
+        });
       });
-      //const jsonString = `{"searchSources":${JSON.stringify(selectedArray)}, "searchIDTypes":[{"searchSource":"DVLA","searchIDType":"DRIVER_LICENSE","value":"D87654322"}], "searchBioDetails":{"firstName":"jane","lastName":"smith"}}`
-      const jsonString=JSON.stringify(searchFilter);
-      console.log(jsonString);
+
+      const jsonString = JSON.stringify(searchFilter);
       stompClient.publish({
         destination: "/app/search",
         body: jsonString
-      });  
+      });
     };
-    stompClient.activate();
-    // const createTimer = (setComplete) => {
-    //   return setTimeout(() => {
-    //     setComplete(true);
-    //   }, Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000);
-    // };
 
-    // const timers = [
-    //   createTimer(setLevBirthComplete),
-    //   createTimer(setIpcsSearchComplete),
-    //   createTimer(setDvlaSearchComplete),
-    // ];
-    // Cleanup function to disconnect the client when the component unmounts
+    stompClient.activate();
+
     return () => {
       if (stompClient.connected) {
         stompClient.deactivate();
@@ -82,11 +79,24 @@ const SearchInProgress = () => {
     };
   }, []);
 
-  const handleViewDetails = () => {
-    setSelectedSources(selectedArray); // Set the selected sources in local state
-    setShowCompareResults(true); // Show the comparison table on the same page
+  // Callback function to update searchResults
+  const updateSearchResults = (resetSearch) => {
+    const existingIndex = searchResults.findIndex(item => item.source === resetSearch.source);
+    // Update existing entry
+    const updatedResults = [...searchResults];
+    updatedResults[existingIndex] = resetSearch;
+    setSearchResults(updatedResults);
   };
 
+  const handleViewDetails = () => {
+    setShowCompareResults(true);
+  };
+
+  const handleCompareMatches = (searchResult) => {
+    setShowCompareMatches(true);
+    setMultiMatchResult(searchResult);
+  };
+  
   return (
     <div className="govuk-width-container">
       <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
@@ -109,25 +119,19 @@ const SearchInProgress = () => {
                 <>
                   <Paragraph>Search Complete</Paragraph>
                   <Paragraph>{result.status}</Paragraph>
-                  <div key={index}>
-                    {result.verifications && result.verifications.map((verification, idx) => (
-                      <Paragraph>{verification}</Paragraph>
-                    ))}
-                  </div>
-                  <Paragraph>{result.verifications}</Paragraph>
+                  {result.verifications && result.verifications.map((verification, idx) => (
+                    <Paragraph key={idx}>{verification}</Paragraph>
+                  ))}
                 </>
               )}
             </div>
             {!result.complete ? (
               <Button className="tile-button" disabled>Stop</Button>
-            ) : 
-            result.status === 'No match found' ? (
+            ) : result.status === 'No match found' ? (
               <Button className="tile-button" style={{ display: 'none' }}>Stop</Button>
-            ) :
-            result.status === 'Multiple matches found' ? (
-              <Button className="tile-button" diabled>Compare Details</Button>
-            ) :
-            (
+            ) : result.status === 'Multiple matches found' ? (
+              <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Compare Details</Button>
+            ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
             )}
           </div>
@@ -136,12 +140,19 @@ const SearchInProgress = () => {
 
       {showCompareResults && (
         <div id="compare-results-section" style={{ marginTop: '20px' }}>
-          <CompareResults searchResults={searchResults} selectedSources={selectedSources} />
+          
+          <CompareResults searchResults={searchResults} selectedSources={selectedArray} />
+        </div>
+      )}
+      {showCompareMatches && (
+        <div id="compare-matches-section" style={{ marginTop: '20px' }}>
+          <CompareMatches multiMatchResult={multiMatchResult} stompClient={stompClient} updateSearchResults={updateSearchResults} 
+        setShowCompareMatches={setShowCompareMatches}/>
         </div>
       )}
 
       <div className="button-container" style={{ marginTop: '20px' }}>
-      <Button onClick={handleBack} className="govuk-button">Back</Button>
+        <Button onClick={handleBack} className="govuk-button">Back</Button>
         <Button onClick={() => window.location.href = '/'} className="govuk-button">Home</Button>
       </div>
     </div>

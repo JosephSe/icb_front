@@ -30,7 +30,7 @@ const SearchSourceChoices = () => {
   const filteredSources = [];
   const [errorMessage, setErrorMessage] = useState('');
   const [levData, setLevData] = useState({
-    birthCertNumber: searchFilter?.searchIDTypes [0]?.idValue ||'',
+    birthCertNumber: searchFilter?.searchIDTypes.find(type => type.idType === 'BIRTH_CERTIFICATE')?.idValue || '',
     firstName: searchFilter?.searchBioDetails?.firstName || '',
     lastName: searchFilter?.searchBioDetails?.lastName || '',
     dateOfBirth: {
@@ -40,8 +40,16 @@ const SearchSourceChoices = () => {
     },
   });
 
+
   const [dvlaData, setDvlaData] = useState({
-    drivingLicenceNumber: '',
+    drivingLicenceNumber: searchFilter?.searchIDTypes.find(type => type.idType === 'DRIVER_LICENSE')?.idValue || '',
+  });
+  
+  const [addressData, setAddressData] = useState({
+    line1: searchFilter?.address?.line1||'',
+    line2:  searchFilter?.address?.line2||'',
+    city:  searchFilter?.address?.city||'',
+    postCode:  searchFilter?.address?.postcode||''
   });
 
   // Handle checkbox changes
@@ -67,6 +75,14 @@ const SearchSourceChoices = () => {
     const { id, value } = event.target;
     setDvlaData({
       ...dvlaData,
+      [id]: value,
+    });
+  };
+  // Handle input changes for address fields
+  const handleAddressInputChange = (event) => {
+    const { id, value } = event.target;
+    setAddressData({
+      ...addressData,
       [id]: value,
     });
   };
@@ -108,20 +124,28 @@ const SearchSourceChoices = () => {
     }
 
     setErrorMessage('');
-    const address = new Address();
-    const uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', levData.birthCertNumber);
+    const uniqueId=[];
+    if(filteredSources.includes('LEV')){
+      const birthId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', levData.birthCertNumber);
+      uniqueId.push(birthId);
+    }
+    if(filteredSources.includes('DVLA')){
+      const driveId=new UniqueId('DVLA','DRIVER_LICENSE',dvlaData.drivingLicenceNumber);
+      uniqueId.push(driveId);
+    }
+   
     const dob = levData.dateOfBirth;
     // Check if year, month, or day is missing, and set formattedDateOfBirth to an empty string if so
     const formattedDateOfBirth = dob.year && dob.month && dob.day
       ? `${dob.year}-${dob.month.padStart(2, '0')}-${dob.day.padStart(2, '0')}`
       : '';
     const bioDetails = new BioDetails(levData.firstName, levData.lastName, '', formattedDateOfBirth);
-    // Create an instance of SearchFilter and pass data
-    // Wrap uniqueId in an array
-    const searchFilter = new SearchFilter(filteredSources, [uniqueId], bioDetails, address);
+    const address=new Address(addressData.line1,addressData.line2,addressData.city,addressData.postCode);
+    
+    
+    const searchFilter = new SearchFilter(filteredSources, uniqueId, bioDetails, address);
 
 
-    //const searchFilter = new SearchFilter(filteredSources, levData, dvlaData);
 
     // Navigate to the 'Search in Progress' page
     navigate('/search-in-progress', { state: { selectedFilter: searchFilter } });
@@ -140,69 +164,100 @@ const SearchSourceChoices = () => {
 
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
 
-          <div className="govuk-checkboxes" data-module="govuk-checkboxes">
-            <div className="govuk-checkboxes__item">
-              <input
-                className="govuk-checkboxes__input"
-                id="levBirth"
-                name="lifeEvent"
-                type="checkbox"
-                value="birth"
-                checked={selectedSources.levBirth}
-                onChange={handleCheckboxChange}
-              />
-              <label className="govuk-label govuk-checkboxes__label" htmlFor="levBirth">
-                LEV - Birth
-              </label>
-            </div>
-            <div className="govuk-checkboxes__item">
-              <input
-                className="govuk-checkboxes__input"
-                id="dvla"
-                name="service"
-                type="checkbox"
-                value="dvla"
-                checked={selectedSources.dvla}
-                onChange={handleCheckboxChange}
-              />
-              <label className="govuk-label govuk-checkboxes__label" htmlFor="dvla">
-                DVLA - Driver Verification Service
-              </label>
-            </div>
-            <div className="govuk-checkboxes__item">
-              <input
-                className="govuk-checkboxes__input"
-                id="ipcs"
-                name="service"
-                type="checkbox"
-                value="ipcs"
-                checked={selectedSources.ipcs}
-                onChange={handleCheckboxChange}
-              />
-              <label className="govuk-label govuk-checkboxes__label" htmlFor="ipcs">
-                IPCS - Irish Passport Check Service
-              </label>
-            </div>
-          </div>
+          <div className="govuk-checkboxes" data-module="govuk-checkboxes" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+  <div className="govuk-checkboxes__item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <input
+        className="govuk-checkboxes__input"
+        id="levBirth"
+        name="lifeEvent"
+        type="checkbox"
+        value="birth"
+        checked={selectedSources.levBirth}
+        onChange={handleCheckboxChange}
+      />
+      <label className="govuk-label govuk-checkboxes__label" htmlFor="levBirth">
+        LEV - Birth
+      </label>
+    </div>
+
+    {/* Birth Certificate Number input inline with checkbox */}
+    {selectedSources.levBirth && (
+      <div className="govuk-form-group" style={{ marginBottom: 0, width: '400px' }}>
+        <label htmlFor="birthCertNumber" className="govuk-label govuk-visually-hidden">
+          Birth Certificate Number
+        </label>
+        <input
+          type="text"
+          id="birthCertNumber"
+          className="govuk-input"
+          placeholder="Enter birth certificate number"
+          value={levData.birthCertNumber}
+          onChange={handleInputChange}
+          style={{ width: '100%' }} // Adjust input width to fit container
+        />
+      </div>
+    )}
+  </div>
+
+  <div className="govuk-checkboxes__item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <input
+        className="govuk-checkboxes__input"
+        id="dvla"
+        name="service"
+        type="checkbox"
+        value="dvla"
+        checked={selectedSources.dvla}
+        onChange={handleCheckboxChange}
+      />
+      <label className="govuk-label govuk-checkboxes__label" htmlFor="dvla">
+        DVLA - Driver Verification Service
+      </label>
+    </div>
+
+    {/* Driving License Number input inline with checkbox */}
+    {selectedSources.dvla && (
+      <div className="govuk-form-group" style={{ marginBottom: 0, width: '400px' }}>
+        <label htmlFor="drivingLicenseNumber" className="govuk-label govuk-visually-hidden">
+          Driving License Number
+        </label>
+        <input
+          type="text"
+          id="drivingLicenceNumber"
+          className="govuk-input"
+          placeholder="Enter driving license number"
+          value={dvlaData.drivingLicenceNumber}
+          onChange={handleDvlaInputChange}
+          style={{ width: '100%' }} // Adjust input width to fit container
+        />
+      </div>
+    )}
+  </div>
+
+  <div className="govuk-checkboxes__item" style={{ display: 'flex', alignItems: 'center' }}>
+    <input
+      className="govuk-checkboxes__input"
+      id="ipcs"
+      name="service"
+      type="checkbox"
+      value="ipcs"
+      checked={selectedSources.ipcs}
+      onChange={handleCheckboxChange}
+    />
+    <label className="govuk-label govuk-checkboxes__label" htmlFor="ipcs">
+      IPCS - Irish Passport Check Service
+    </label>
+  </div>
+</div>
+
         </fieldset>
       </div>
 
       {/* Conditionally render LEV form fields when the LEV checkbox is selected */}
       {selectedSources.levBirth && (
         <div className="govuk-form-group">
-          <h2 className="govuk-heading-m">LEV - Birth Details</h2>
-
-          <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
-            <label htmlFor="birthCertNumber" className="govuk-label">Birth Certificate Number</label>
-            <input
-              type="text"
-              id="birthCertNumber"
-              className="govuk-input"
-              placeholder="Enter birth certificate number"
-              value={levData.birthCertNumber}
-              onChange={handleInputChange}
-            />
-          </div>
+        
 
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
             <h2 className="govuk-heading-m">Biographic Details</h2>
@@ -234,7 +289,7 @@ const SearchSourceChoices = () => {
           <fieldset className="govuk-fieldset" style={{ marginBottom: '30px' }}>
             <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">Date of Birth</legend>
             <div id="dob-hint" className="govuk-hint">
-              For example, 31 3 1980
+              For example, 31 03 1980
             </div>
             <div className="govuk-date-input">
               <div className="govuk-date-input__item" style={{ marginRight: '10px' }}>
@@ -278,6 +333,52 @@ const SearchSourceChoices = () => {
               </div>
             </div>
           </fieldset>
+          <h2 className="govuk-heading-m">Address Details</h2>
+          <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
+            <label htmlFor="line1" className="govuk-label">Line 1</label>
+            <input
+              type="text"
+              id="line1"
+              className="govuk-input"
+              placeholder="Enter line 1"
+              value={addressData.line1}
+              onChange={handleAddressInputChange}
+            />
+          </div>
+          <div className="govuk-form-group">
+            <label htmlFor="line2" className="govuk-label">Line 2</label>
+            <input
+              type="text"
+              id="line2"
+              className="govuk-input"
+              placeholder="Enter line 2"
+              value={addressData.line2}
+              onChange={handleAddressInputChange}
+            />
+          </div>
+          <div className="govuk-form-group">
+            <label htmlFor="city" className="govuk-label">City</label>
+            <input
+              type="text"
+              id="city"
+              className="govuk-input"
+              placeholder="Enter city"
+              value={addressData.city}
+              onChange={handleAddressInputChange}
+            />
+          </div>
+
+          <div className="govuk-form-group">
+            <label htmlFor="postalCode" className="govuk-label">Postcode</label>
+            <input
+              type="text"
+              id="postCode"
+              className="govuk-input"
+              placeholder="Post Code"
+              value={addressData.postCode}
+              onChange={handleAddressInputChange}
+            />
+          </div>
         </div>
       )}
 
