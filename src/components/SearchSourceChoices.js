@@ -32,6 +32,7 @@ const SearchSourceChoices = () => {
   const [levData, setLevData] = useState({
     birthCertNumber: searchFilter?.searchIDTypes.find(type => type.idType === 'BIRTH_CERTIFICATE')?.idValue || '',
     firstName: searchFilter?.searchBioDetails?.firstName || '',
+    middleName:searchFilter?.searchBioDetails?.middleName || '',
     lastName: searchFilter?.searchBioDetails?.lastName || '',
     dateOfBirth: {
       day: searchFilter?.searchBioDetails?.dateOfBirth?.split('-')[2] || '',
@@ -139,7 +140,7 @@ const SearchSourceChoices = () => {
     const formattedDateOfBirth = dob.year && dob.month && dob.day
       ? `${dob.year}-${dob.month.padStart(2, '0')}-${dob.day.padStart(2, '0')}`
       : '';
-    const bioDetails = new BioDetails(levData.firstName, levData.lastName, '', formattedDateOfBirth);
+    const bioDetails = new BioDetails(levData.firstName, levData.lastName, levData.middleName, formattedDateOfBirth);
     const address=new Address(addressData.line1,addressData.line2,addressData.city,addressData.postCode);
     
     
@@ -272,7 +273,18 @@ const SearchSourceChoices = () => {
               required
             />
           </div>
-
+          <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
+            <label htmlFor="middleName" className="govuk-label">Middle Name <span className="govuk-required">* </span></label>
+            <input
+              type="text"
+              id="middleName"
+              className="govuk-input"
+              placeholder="Enter Middle name"
+              value={levData.middleName}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
             <label htmlFor="lastName" className="govuk-label">Last Name <span className="govuk-required">* </span></label>
             <input
