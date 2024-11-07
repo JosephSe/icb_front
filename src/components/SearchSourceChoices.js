@@ -143,7 +143,6 @@ const SearchSourceChoices = () => {
     const bioDetails = new BioDetails(levData.firstName, levData.lastName, levData.middleName, formattedDateOfBirth);
     const address=new Address(addressData.line1,addressData.line2,addressData.city,addressData.postCode);
     
-    
     const searchFilter = new SearchFilter(filteredSources, uniqueId, bioDetails, address);
 
 
@@ -256,10 +255,8 @@ const SearchSourceChoices = () => {
       </div>
 
       {/* Conditionally render LEV form fields when the LEV checkbox is selected */}
-      {selectedSources.levBirth && (
+      {(selectedSources.levBirth || selectedSources.dvla)&& (
         <div className="govuk-form-group">
-        
-
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
             <h2 className="govuk-heading-m">Biographic Details</h2>
             <label htmlFor="firstName" className="govuk-label">First Name <span className="govuk-required">* </span></label>
@@ -345,6 +342,10 @@ const SearchSourceChoices = () => {
               </div>
             </div>
           </fieldset>
+          </div>
+      )}  
+      {selectedSources.dvla && (
+        <div className="govuk-form-group">
           <h2 className="govuk-heading-m">Address Details</h2>
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
             <label htmlFor="line1" className="govuk-label">Line 1</label>
@@ -391,8 +392,8 @@ const SearchSourceChoices = () => {
               onChange={handleAddressInputChange}
             />
           </div>
-        </div>
-      )}
+         </div>
+        )}  
 
 
       <div className="button-container">
