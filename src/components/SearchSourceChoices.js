@@ -271,7 +271,7 @@ const SearchSourceChoices = () => {
             />
           </div>
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
-            <label htmlFor="middleName" className="govuk-label">Middle Name <span className="govuk-required">* </span></label>
+            <label htmlFor="middleName" className="govuk-label">Middle Name </label>
             <input
               type="text"
               id="middleName"
