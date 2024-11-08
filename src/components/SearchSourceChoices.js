@@ -45,6 +45,9 @@ const SearchSourceChoices = () => {
   const [dvlaData, setDvlaData] = useState({
     drivingLicenceNumber: searchFilter?.searchIDTypes.find(type => type.idType === 'DRIVER_LICENSE')?.idValue || '',
   });
+  const [ipcsData, setIpcsData] = useState({
+    passportNumber: searchFilter?.searchIDTypes.find(type => type.idType === 'IPCS_PPT_NUM')?.idValue || '',
+  });
   
   const [addressData, setAddressData] = useState({
     line1: searchFilter?.address?.line1||'',
@@ -76,6 +79,13 @@ const SearchSourceChoices = () => {
     const { id, value } = event.target;
     setDvlaData({
       ...dvlaData,
+      [id]: value,
+    });
+  };
+  const handleIpcsInputChange = (event) => {
+    const { id, value } = event.target;
+    setIpcsData({
+      ...ipcsData,
       [id]: value,
     });
   };
@@ -133,6 +143,10 @@ const SearchSourceChoices = () => {
     if(filteredSources.includes('DVLA')){
       const driveId=new UniqueId('DVLA','DRIVER_LICENSE',dvlaData.drivingLicenceNumber);
       uniqueId.push(driveId);
+    }
+    if(filteredSources.includes('IPCS')){
+      const passport=new UniqueId('IPCS','IPCS_PPT_NUM',ipcsData.passportNumber);
+      uniqueId.push(passport);
     }
    
     const dob = levData.dateOfBirth;
@@ -234,8 +248,8 @@ const SearchSourceChoices = () => {
       </div>
     )}
   </div>
-
-  <div className="govuk-checkboxes__item" style={{ display: 'flex', alignItems: 'center' }}>
+  <div className="govuk-checkboxes__item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <div style={{ display: 'flex', alignItems: 'center' }}>
     <input
       className="govuk-checkboxes__input"
       id="ipcs"
@@ -249,13 +263,30 @@ const SearchSourceChoices = () => {
       IPCS - Irish Passport Check Service
     </label>
   </div>
+  {selectedSources.ipcs && (
+      <div className="govuk-form-group" style={{ marginBottom: 0, width: '400px' }}>
+        <label htmlFor="drivingLicenseNumber" className="govuk-label govuk-visually-hidden">
+          Driving License Number
+        </label>
+        <input
+          type="text"
+          id="passportNumber"
+          className="govuk-input"
+          placeholder="Enter passport number"
+          value={ipcsData.passportNumber}
+          onChange={handleIpcsInputChange}
+          style={{ width: '100%' }} // Adjust input width to fit container
+        />
+      </div>
+    )}
+  </div>
 </div>
 
         </fieldset>
       </div>
 
       {/* Conditionally render LEV form fields when the LEV checkbox is selected */}
-      {(selectedSources.levBirth || selectedSources.dvla)&& (
+      {(selectedSources.levBirth || selectedSources.dvla||selectedSources.ipcs)&& (
         <div className="govuk-form-group">
           <div className="govuk-form-group" style={{ marginBottom: '20px' }}>
             <h2 className="govuk-heading-m">Biographic Details</h2>

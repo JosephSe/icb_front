@@ -44,7 +44,8 @@ const SearchInProgress = () => {
           result.match?.verifications,
           result.multiMatches || [], // MultiMatches array, default to empty if not provided
           result.birthCertificate ? result.birthCertificate : undefined,
-          result.drivingLicenseNumber ? result.drivingLicenseNumber : undefined
+          result.drivingLicenseNumber ? result.drivingLicenseNumber : undefined,
+          result.passportNumber ? result.passportNumber : undefined
         );
         
 
