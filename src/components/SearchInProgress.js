@@ -89,10 +89,12 @@ const SearchInProgress = () => {
   };
 
   const handleViewDetails = () => {
+    setShowCompareMatches(false);
     setShowCompareResults(true);
   };
 
   const handleCompareMatches = (searchResult) => {
+    setShowCompareResults(false)
     setShowCompareMatches(true);
     setMultiMatchResult(searchResult);
   };
