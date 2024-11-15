@@ -8,7 +8,7 @@ import SearchResult from '../models/SearchResult';
 const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, setShowCompareMatches }) => {
     const navigate = useNavigate();
     const multiMatches = multiMatchResult.multiMatches || [];
-    const columns = ["First Name", "Middle Name", "Last Name", "Birthdate", "Address", ""];
+    const columns = ["First Name", "Middle Name", "Last Name", "Birthdate", "Address", "Flag", ""];
 
     if (multiMatchResult.source === "LEV") {
         columns.splice(5, 0, "Birth Certificate Number");
@@ -22,9 +22,9 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
         const filteredSources = [multiMatchResult.source];
         let uniqueId = new UniqueId();
         if (multiMatchResult.source === 'LEV') {
-          uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', selectedData.birthCertificate);
+            uniqueId = new UniqueId('LEV', 'BIRTH_CERTIFICATE', selectedData.birthCertificate);
         } else {
-          uniqueId = new UniqueId('DVLA', 'DRIVER_LICENSE', selectedData.drivingLicenseNumber);
+            uniqueId = new UniqueId('DVLA', 'DRIVER_LICENSE', selectedData.drivingLicenseNumber);
         }
         const bioDetails = new BioDetails(selectedData.firstName, selectedData.lastName, '', selectedData.dateOfBirth);
 
@@ -40,12 +40,13 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                 destination: "/app/search",
                 body: jsonString
             });
-            
+
             setShowCompareMatches(false);
         } else {
             console.error("STOMP client is not connected. Unable to publish.");
         }
     };
+
 
     return (
         <div className="govuk-width-container">
@@ -85,6 +86,11 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                                 {multiMatchResult.source === "DVLA" && (
                                     <td className="govuk-table__cell">{row.drivingLicenseNumber || 'N/A'}</td>
                                 )}
+                                <td className="govuk-table__cell">
+                                    {row.flag === 'RED' ? '🚩' : row.flag === 'AMBER' ? '⚠️' : 'N/A'}
+                                </td>
+
+
                                 <td className="govuk-table__cell">
                                     <button className="govuk-button" onClick={() => handleSelect(index)}>Select</button>
                                 </td>
