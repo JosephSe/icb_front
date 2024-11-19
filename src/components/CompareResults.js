@@ -70,11 +70,13 @@ console.log("sourceColorMap:", sourceColorMap);
   selectedSources.forEach((source) => {
     const index = searchResults.findIndex(item => item.source === source);
     const searchResult = searchResults[index];
-    let status = 'N/A';
+    let status = 'Waiting...';
     if (searchResult.status === 'No match found') {
       status = 'N/A';
     } else if (searchResult.status === 'Multiple matches found') {
       status = 'Resolve...';
+    } else if (searchResult.status === 'One match found') {
+      status = '-';
     }
     data.forEach((row) => {
       if (!row.fields[source]) {
