@@ -1,5 +1,5 @@
 class ICBMatchRecord {
-    constructor(firstName, middleName, lastName, dateOfBirth, address, drivingLicenseNumber, passportNumber, birthCertificate, photo) {
+    constructor(firstName, middleName, lastName, dateOfBirth, address, drivingLicenseNumber, passportNumber, birthCertificate, fileName) {
       this.firstName = firstName || ''; // Default to empty string if not provided
       this.middleName = middleName || '';
       this.lastName = lastName || '';
@@ -8,9 +8,8 @@ class ICBMatchRecord {
       this.drivingLicenseNumber = drivingLicenseNumber || '';
       this.passportNumber = passportNumber || '';
       this.birthCertificate = birthCertificate || '';
-      this.photo = photo || '';
+      this.fileName = fileName ;
     }
     
-   
   }
   export default ICBMatchRecord;

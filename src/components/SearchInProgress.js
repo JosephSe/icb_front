@@ -25,7 +25,7 @@ const SearchInProgress = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [multiMatchResult, setMultiMatchResult] = useState([]);
   const [stompClient, setStompClient] = useState(null);
-  const [resultP,setResult]=useState(null);
+  const [resultP, setResult] = useState(null);
 
 
 
@@ -45,22 +45,27 @@ const SearchInProgress = () => {
         const result = JSON.parse(message.body);
         const createICBMatchRecordInstance = (icbMatchRecordData) => {
           if (icbMatchRecordData) {
-            // Create a new ICBMatchRecord instance with the fields from result.match.icbMatchRecord
+            const cleanedFileName = icbMatchRecordData.fileName.replace(/^["]+|["]+$/g, '');
+
+
+            // Construct the URL
+            const baseUrl = "http://localhost:8080";
+            const formattedUrl = `${baseUrl}/${cleanedFileName}`;
             return new ICBMatchRecord(
-              icbMatchRecordData.firstName, 
-              icbMatchRecordData.middleName, 
-              icbMatchRecordData.lastName, 
+              icbMatchRecordData.firstName,
+              icbMatchRecordData.middleName,
+              icbMatchRecordData.lastName,
               icbMatchRecordData.dateOfBirth,  // Assuming dateOfBirth is a valid date string or object
-              icbMatchRecordData.address, 
-              icbMatchRecordData.drivingLicenseNumber, 
-              icbMatchRecordData.passportNumber, 
-              icbMatchRecordData.birthCertificate, 
-              icbMatchRecordData.photo
+              icbMatchRecordData.address,
+              icbMatchRecordData.drivingLicenseNumber,
+              icbMatchRecordData.passportNumber,
+              icbMatchRecordData.birthCertificate,
+              formattedUrl
             );
           }
           return null; // Return null or handle the case where there's no valid data
         };
-        
+
         // Example usage:
         const icbMatchRecordInstance = createICBMatchRecordInstance(result.match?.icbMatchRecord);
         const icbMatch = new ICBMatch(
@@ -69,7 +74,7 @@ const SearchInProgress = () => {
           result.match?.fullRecordAvailable || false,    // Default to false if isFullRecordAvailable is undefined
           icbMatchRecordInstance       // Default to undefined if icbMatchRecord is undefined
         );
-        
+
         const newSearchResult = new SearchResult(
           result.searchSource,
           result.searchComplete,
@@ -79,7 +84,7 @@ const SearchInProgress = () => {
           result.birthCertificate ? result.birthCertificate : undefined,
           result.drivingLicenseNumber ? result.drivingLicenseNumber : undefined,
           result.passportNumber ? result.passportNumber : undefined,
-        
+
         );
 
         setSearchResults(prevResults => {
@@ -113,7 +118,7 @@ const SearchInProgress = () => {
     };
   }, []);
 
-  
+
 
   // Callback function to update searchResults
   const updateSearchResults = (resetSearch) => {
@@ -153,7 +158,7 @@ const SearchInProgress = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
         {searchResults.map((result, index) => (
-          
+
           <div className="tile" key={result.source}>
             <div className="tile-content">
               <h2 className="govuk-heading-m">{result.source === 'LEV' ? 'LEV - BIRTH' : result.source}</h2>
@@ -178,8 +183,8 @@ const SearchInProgress = () => {
               <Button className="tile-button" style={{ display: 'none' }}>Stop</Button>
             ) : result.status === 'Multiple matches found' ? (
               <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Compare Results</Button>
-            ): result.status === 'One match found'&& result.icbMatch.isFullRecordAvailable ?(
-              
+            ) : result.status === 'One match found' && result.icbMatch.isFullRecordAvailable ? (
+
               <>
                 <Button className="tile-button" onClick={() => handleViewData(result)}>View Result</Button>
                 <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>

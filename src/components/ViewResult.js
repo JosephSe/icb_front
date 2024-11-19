@@ -30,12 +30,16 @@ const ViewResult = ({ searchResults, selectedSources}) => {
   }
   console.log("data   ",data)
   const capitalizeFirstLetter = (str) => {
+    if(str=='fileName'){
+      return "Photo"
+    }
     if (typeof str === 'string') {
       return str
         .split(/(?=[A-Z])/)
         .join(" ")
         .replace(/\b\w/g, (char) => char.toUpperCase());
     }
+   
     return str;
   };
   
@@ -90,7 +94,14 @@ const ViewResult = ({ searchResults, selectedSources}) => {
                   </th>
                   <td className="govuk-table__cell" key={source}>
                   {row.label === "dateOfBirth" ? formatDateOfBirth(row.fields[source]) : 
-                      row.label === "address" ? formatAddress(row.fields[source]) : 
+                      row.label === "address" ? formatAddress(row.fields[source]) :
+                      row.label === "fileName" ? (  // Assuming 'fileName' contains the image path
+                        <img 
+                          src={row.fields[source]} 
+                          alt="Image" 
+                          style={{ width: '100px', height: 'auto' }}  // Set dimensions if needed
+                        />
+                      ) :
                       row.fields[source]}
                   </td>
                 </tr>
