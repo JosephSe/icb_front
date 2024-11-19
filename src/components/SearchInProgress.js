@@ -5,6 +5,11 @@ import CompareResults from './CompareResults';
 import CompareMatches from './CompareMatches';
 import SearchResult from '../models/SearchResult';
 import { Client } from '@stomp/stompjs';
+import ViewResult from './ViewResult.js';
+import ICBMatch from '../models/ICBMatch.js';
+import ICBMatchRecord from '../models/ICBMatchRecord.js';
+
+
 
 const SearchInProgress = () => {
   const navigate = useNavigate();
@@ -16,11 +21,13 @@ const SearchInProgress = () => {
   const selectedArray = searchFilter?.searchSources || [];
   const [showCompareResults, setShowCompareResults] = useState(false);
   const [showCompareMatches, setShowCompareMatches] = useState(false);
+  const [showData, setShowData] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [multiMatchResult, setMultiMatchResult] = useState([]);
   const [stompClient, setStompClient] = useState(null);
+  const [resultP,setResult]=useState(null);
 
- 
+
 
   useEffect(() => {
     // Initialize the searchResults with selected sources if empty
@@ -36,18 +43,44 @@ const SearchInProgress = () => {
     stompClient.onConnect = () => {
       stompClient.subscribe('/session/topic/results', (message) => {
         const result = JSON.parse(message.body);
+        const createICBMatchRecordInstance = (icbMatchRecordData) => {
+          if (icbMatchRecordData) {
+            // Create a new ICBMatchRecord instance with the fields from result.match.icbMatchRecord
+            return new ICBMatchRecord(
+              icbMatchRecordData.firstName, 
+              icbMatchRecordData.middleName, 
+              icbMatchRecordData.lastName, 
+              icbMatchRecordData.dateOfBirth,  // Assuming dateOfBirth is a valid date string or object
+              icbMatchRecordData.address, 
+              icbMatchRecordData.drivingLicenseNumber, 
+              icbMatchRecordData.passportNumber, 
+              icbMatchRecordData.birthCertificate, 
+              icbMatchRecordData.photo
+            );
+          }
+          return null; // Return null or handle the case where there's no valid data
+        };
+        
+        // Example usage:
+        const icbMatchRecordInstance = createICBMatchRecordInstance(result.match?.icbMatchRecord);
+        const icbMatch = new ICBMatch(
+          result.match?.matches || [],                     // Default to empty array if matches is undefined
+          result.match?.verifications || [],               // Default to empty array if verifications is undefined
+          result.match?.fullRecordAvailable || false,    // Default to false if isFullRecordAvailable is undefined
+          icbMatchRecordInstance       // Default to undefined if icbMatchRecord is undefined
+        );
+        
         const newSearchResult = new SearchResult(
           result.searchSource,
           result.searchComplete,
           result.matchStatus,
-          result.match?.matches,
-          result.match?.verifications,
+          icbMatch,
           result.multiMatches || [], // MultiMatches array, default to empty if not provided
           result.birthCertificate ? result.birthCertificate : undefined,
           result.drivingLicenseNumber ? result.drivingLicenseNumber : undefined,
-          result.passportNumber ? result.passportNumber : undefined
-        );
+          result.passportNumber ? result.passportNumber : undefined,
         
+        );
 
         setSearchResults(prevResults => {
           const existingIndex = prevResults.findIndex(item => item.source === result.searchSource);
@@ -80,6 +113,8 @@ const SearchInProgress = () => {
     };
   }, []);
 
+  
+
   // Callback function to update searchResults
   const updateSearchResults = (resetSearch) => {
     const existingIndex = searchResults.findIndex(item => item.source === resetSearch.source);
@@ -90,16 +125,24 @@ const SearchInProgress = () => {
   };
 
   const handleViewDetails = () => {
+    setShowData(false);
     setShowCompareMatches(false);
     setShowCompareResults(true);
   };
+  const handleViewData = (result) => {
+    setShowCompareMatches(false);
+    setShowCompareResults(false);
+    setResult(result)
+    setShowData(true);
+  };
 
   const handleCompareMatches = (searchResult) => {
+    setShowData(false);
     setShowCompareResults(false)
     setShowCompareMatches(true);
     setMultiMatchResult(searchResult);
   };
-  
+
   return (
     <div className="govuk-width-container">
       <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
@@ -110,6 +153,7 @@ const SearchInProgress = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
         {searchResults.map((result, index) => (
+          
           <div className="tile" key={result.source}>
             <div className="tile-content">
               <h2 className="govuk-heading-m">{result.source === 'LEV' ? 'LEV - BIRTH' : result.source}</h2>
@@ -133,24 +177,37 @@ const SearchInProgress = () => {
             ) : result.status === 'No match found' ? (
               <Button className="tile-button" style={{ display: 'none' }}>Stop</Button>
             ) : result.status === 'Multiple matches found' ? (
-              <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Compare Details</Button>
+              <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Compare Results</Button>
+            ): result.status === 'One match found'&& result.icbMatch.isFullRecordAvailable ?(
+              
+              <>
+                <Button className="tile-button" onClick={() => handleViewData(result)}>View Result</Button>
+                <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>
+              </>
             ) : (
-              <Button className="tile-button" onClick={handleViewDetails}>View Details</Button>
+              <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>
             )}
+
           </div>
         ))}
       </div>
 
       {showCompareResults && (
         <div id="compare-results-section" style={{ marginTop: '20px' }}>
-          
+
           <CompareResults searchResults={searchResults} selectedSources={selectedArray} />
         </div>
       )}
       {showCompareMatches && (
         <div id="compare-matches-section" style={{ marginTop: '20px' }}>
-          <CompareMatches multiMatchResult={multiMatchResult} stompClient={stompClient} updateSearchResults={updateSearchResults} 
-        setShowCompareMatches={setShowCompareMatches}/>
+          <CompareMatches multiMatchResult={multiMatchResult} stompClient={stompClient} updateSearchResults={updateSearchResults}
+            setShowCompareMatches={setShowCompareMatches} />
+        </div>
+      )}
+      {showData && (
+        <div id="view-result-section" style={{ marginTop: '20px' }}>
+
+          <ViewResult searchResults={resultP} selectedSources={resultP.source} />
         </div>
       )}
 
