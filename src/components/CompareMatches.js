@@ -61,7 +61,7 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                     </legend>
                 </fieldset>
                 <div id="comparison-hint" className="govuk-hint">
-                    Compare results across matches for various attributes.
+                    Resolve multiple matches based search results.
                 </div>
                 <table className="govuk-table">
                     <thead className="govuk-table__head">
