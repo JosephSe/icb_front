@@ -8,7 +8,7 @@ import SearchResult from '../models/SearchResult';
 const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, setShowCompareMatches }) => {
     const navigate = useNavigate();
     const multiMatches = multiMatchResult.multiMatches || [];
-    const columns = ["First Name", "Middle Name", "Last Name", "Birthdate", "Address", "Flag", ""];
+    const columns = ["First Name", "Middle Name", "Last Name", "Date of Birth", "Address", "Flag", ""];
 
     if (multiMatchResult.source === "LEV") {
         columns.splice(5, 0, "Birth Certificate Number");
@@ -47,13 +47,17 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
         }
     };
 
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
 
     return (
         <div className="govuk-width-container">
             <main className="govuk-main-wrapper" id="main-content" role="main">
                 <fieldset className="govuk-fieldset" aria-describedby="comparison-hint">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 className="govuk-fieldset__heading">Comparison Table</h1>
+                        <h1 className="govuk-fieldset__heading">Multiple Matches Resolution...</h1>
                     </legend>
                 </fieldset>
                 <div id="comparison-hint" className="govuk-hint">
@@ -73,7 +77,7 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                                 <td className="govuk-table__cell">{row.firstName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.middleName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.lastName || 'N/A'}</td>
-                                <td className="govuk-table__cell">{row.dateOfBirth || 'N/A'}</td>
+                                <td className="govuk-table__cell">{row.dateOfBirth ? formatDate(row.dateOfBirth) : 'N/A'}</td>
                                 <td className="govuk-table__cell">
                                     {row.address
                                         ? row.address.replace(/^"|"$|\\\"/g, '').replace(/(.*?)(\s+)(.*?)(\s+)(.*)/, '$1, $3, $5')
@@ -87,7 +91,7 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                                     <td className="govuk-table__cell">{row.drivingLicenseNumber || 'N/A'}</td>
                                 )}
                                 <td className="govuk-table__cell">
-                                    {row.flag === 'RED' ? '🚩' : row.flag === 'AMBER' ? '⚠️' : 'N/A'}
+                                    {row.flag === 'RED' ? '🚩' : row.flag === 'AMBER' ? '⚠️' : '-'}
                                 </td>
 
 

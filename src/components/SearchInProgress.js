@@ -182,7 +182,7 @@ const SearchInProgress = () => {
             ) : result.status === 'No match found' ? (
               <Button className="tile-button" style={{ display: 'none' }}>Stop</Button>
             ) : result.status === 'Multiple matches found' ? (
-              <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Compare Results</Button>
+              <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Resolve Multiple Matches</Button>
             ) : result.status === 'One match found' && result.icbMatch.isFullRecordAvailable ? (
 
               <>

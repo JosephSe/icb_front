@@ -18,8 +18,8 @@ const CompareResults = ({ searchResults, selectedSources }) => {
   selectedSources.forEach((source) => {
     const index = searchResults.findIndex(item => item.source === source);
     const searchResult = searchResults[index];
-    if (searchResult.icbMatch.matches) {
-      searchResult.icbMatch.matches.forEach((match) => {
+    if (searchResult.icbMatch?.matches) {
+      searchResult.icbMatch?.matches.forEach((match) => {
         
         const index1 = data.findIndex(item => item.label === match.first);
         if (index1 === -1) {
