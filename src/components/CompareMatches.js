@@ -8,10 +8,11 @@ import SearchResult from '../models/SearchResult';
 const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, setShowCompareMatches }) => {
     const navigate = useNavigate();
     const multiMatches = multiMatchResult.multiMatches || [];
-    const columns = ["First Name", "Middle Name", "Last Name", "Date of Birth", "Address", "Flag", ""];
+    const columns = ["First Name", "Middle Name", "Last Name", "Date of Birth", "Address", ""];
 
     if (multiMatchResult.source === "LEV") {
         columns.splice(5, 0, "Birth Certificate Number");
+        columns.splice(6, 0, "Flag");
     } else if (multiMatchResult.source === "DVLA") {
         columns.splice(5, 0, "Driving Licence Number");
     }
@@ -75,7 +76,7 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                         {multiMatches.map((row, index) => (
                             <tr className="govuk-table__row" key={index}>
                                 <td className="govuk-table__cell">{row.firstName || 'N/A'}</td>
-                                <td className="govuk-table__cell">{row.middleName || 'N/A'}</td>
+                                <td className="govuk-table__cell">{row.middleName || '-'}</td>
                                 <td className="govuk-table__cell">{row.lastName || 'N/A'}</td>
                                 <td className="govuk-table__cell">{row.dateOfBirth ? formatDate(row.dateOfBirth) : 'N/A'}</td>
                                 <td className="govuk-table__cell">
@@ -90,9 +91,11 @@ const CompareMatches = ({ multiMatchResult, stompClient, updateSearchResults, se
                                 {multiMatchResult.source === "DVLA" && (
                                     <td className="govuk-table__cell">{row.drivingLicenseNumber || 'N/A'}</td>
                                 )}
-                                <td className="govuk-table__cell">
+                                {multiMatchResult.source === "LEV" && (
+                                    <td className="govuk-table__cell">
                                     {row.flag === 'RED' ? '🚩' : row.flag === 'AMBER' ? '⚠️' : '-'}
-                                </td>
+                                    </td>
+                                )}
 
 
                                 <td className="govuk-table__cell">

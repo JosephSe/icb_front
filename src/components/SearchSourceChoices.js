@@ -109,21 +109,7 @@ const SearchSourceChoices = () => {
     }));
   };
 
-  const validateFields = () => {
-    if (selectedSources.levBirth) {
-      const { firstName, lastName } = levData;
-      if (!firstName || !lastName) {
-        setErrorMessage('First Name and Last Name are mandatory for LEV Birth.');
-        return false;
-      }
-    }
-    return true;
-  };
- 
   const handleContinue = () => {
-    if (!validateFields()) {
-      return;
-    }
     
     if (selectedSources.levBirth) filteredSources.push('LEV');
     if (selectedSources.dvla) filteredSources.push('DVLA');
