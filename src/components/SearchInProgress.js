@@ -171,7 +171,7 @@ const SearchInProgress = () => {
                 <>
                   <Paragraph>Search Complete</Paragraph>
                   <Paragraph>{result.status}</Paragraph>
-                  {result.verifications && result.verifications.map((verification, idx) => (
+                  {result.icbMatch?.verifications && result.icbMatch?.verifications.map((verification, idx) => (
                     <Paragraph key={idx}>{verification}</Paragraph>
                   ))}
                 </>
