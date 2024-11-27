@@ -8,6 +8,7 @@ const CompareResults = ({ searchResults, selectedSources }) => {
   const [showTable, setShowTable] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [resultD, setResultD] = useState(null);
+  const [viewIndex, setViewIndex] = useState(null);
   const data = [
     // { label: "First Name", fields: {  } },
     // { label: "Middle Name", fields: {  } },
@@ -58,24 +59,20 @@ const CompareResults = ({ searchResults, selectedSources }) => {
     });
   }
   });
-  console.log("row is", data);
-const sourceColorMap = {};
+  const sourceColorMap = {};
 
-data.forEach(row => {
-  selectedSources.forEach(source => {
-    Object.keys(row.fields).forEach(fieldKey => {
-      if (row.fields[fieldKey] === "🚩") {
-        sourceColorMap[fieldKey] = "red";
-      } else if (row.fields[fieldKey] === "⚠️") {
-        sourceColorMap[fieldKey] = "orange";
-      }
+  data.forEach(row => {
+    selectedSources.forEach(source => {
+      Object.keys(row.fields).forEach(fieldKey => {
+        if (row.fields[fieldKey] === "🚩") {
+          sourceColorMap[fieldKey] = "red";
+        } else if (row.fields[fieldKey] === "⚠️") {
+          sourceColorMap[fieldKey] = "orange";
+        }
+      });
     });
   });
-});
 
-console.log("sourceColorMap:", sourceColorMap);
-
-  
   selectedSources.forEach((source) => {
     const index = searchResults.findIndex(item => item.source === source);
     const searchResult = searchResults[index];
@@ -92,12 +89,12 @@ console.log("sourceColorMap:", sourceColorMap);
           row.fields[source] = status;
         }
       });
-    });
-    const handleViewData = (result) => {
-      setResultD(result);
-      setShowDetails(prevShowDetails => !prevShowDetails);
-    };
-    console.log("resultD  ",showDetails)
+  });
+  const handleViewData = (result, idx) => {
+    setResultD(result);
+    setShowDetails(prevShowDetails => !prevShowDetails || viewIndex !== idx);
+    setViewIndex(idx);
+  };
   
   return (
     <div className="govuk-width-container">
@@ -144,7 +141,7 @@ console.log("sourceColorMap:", sourceColorMap);
             {flag && (
               <tr className="govuk-table__row">
                 <th scope="row" className="govuk-table__header">Details</th>
-                {selectedSources.map((source) => {
+                {selectedSources.map((source, colIndex) => {
                   const index = searchResults.findIndex(item => item.source === source);
                   const searchResult = searchResults[index];
 
@@ -156,8 +153,8 @@ console.log("sourceColorMap:", sourceColorMap);
                       style={{ color: sourceColorMap[source] || "inherit" }}
                     >
                       {searchResult.icbMatch?.isFullRecordAvailable ? (
-                        <button onClick={() => handleViewData(searchResult)}>
-                          {showDetails ? 'Hide Details' : 'View Details'}
+                        <button onClick={() => handleViewData(searchResult, colIndex)}>
+                          {showDetails && viewIndex === colIndex ? 'Hide Details' : 'View Details'}
                         </button>
                       ) : (
                         "-"
@@ -178,8 +175,6 @@ console.log("sourceColorMap:", sourceColorMap);
           <ViewResult searchResults={resultD} selectedSources={resultD.source} />
         </div>
       )}
-        
-        
       </main>
     </div>
   );

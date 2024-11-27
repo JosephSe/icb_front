@@ -1,7 +1,6 @@
 import React from 'react';
 
 const ViewResult = ({ searchResults, selectedSources}) => {
-  console.log("searchResults is    ",searchResults)
   const data = [
   ];
 
