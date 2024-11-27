@@ -45,7 +45,7 @@ const SearchInProgress = () => {
         const result = JSON.parse(message.body);
         const createICBMatchRecordInstance = (icbMatchRecordData) => {
           if (icbMatchRecordData) {
-            const cleanedFileName = icbMatchRecordData.fileName.replace(/^["]+|["]+$/g, '');
+            const cleanedFileName = icbMatchRecordData.fileName?.replace(/^["]+|["]+$/g, '');
 
 
             // Construct the URL
