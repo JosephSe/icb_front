@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ViewResult from './ViewResult.js';
+
+
 
 const CompareResults = ({ searchResults, selectedSources }) => {
-  
-  
+  const [showTable, setShowTable] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
+  const [resultD, setResultD] = useState(null);
+  const [viewIndex, setViewIndex] = useState(null);
   const data = [
     // { label: "First Name", fields: {  } },
     // { label: "Middle Name", fields: {  } },
@@ -12,35 +18,39 @@ const CompareResults = ({ searchResults, selectedSources }) => {
     // { label: "Unique Identifier - Birth Cert", fields: {} },
     // { label: "Driving Licence Number", fields: { } },
   ];
-  const excludedLabels = ['First Name data', 'Middle Name data','Last Name data','Date of Birth data','Address data',
-    'Unique Identifier - Birth Cert data','Driving Licence Number data','Passport Number data'
-   ];
-  selectedSources.forEach((source) => {
-    const index = searchResults.findIndex(item => item.source === source);
-    const searchResult = searchResults[index];
-    if (searchResult.icbMatch?.matches) {
-      searchResult.icbMatch?.matches.forEach((match) => {
+  let flag=false;
+    selectedSources.forEach((source) => {
+      const index = searchResults.findIndex(item => item.source === source);
+      const searchResult = searchResults[index];
+
+      if (!flag&&searchResult.icbMatch?.isFullRecordAvailable) {
+        flag=true;
+      }
+
+      if (searchResult.icbMatch?.matches) {
         
-        const index1 = data.findIndex(item => item.label === match.first);
-        if (index1 === -1) {
+    
+        searchResult.icbMatch?.matches.forEach((match) => {
+          const index1 =data.findIndex(item => item.label === match.first);
+          if (index1 === -1) {
           // If no existing entry in `data`, add a new one.
           data.push({ 
-            label: match.first, 
-            fields: { 
-              [source]: match.second === 'YES' ? "✔" : match.second === 'NO' ? <strong>X</strong> 
+              label: match.first,
+              fields: {
+                [source]: match.second === 'YES' ? "✔" : match.second === 'NO' ? <strong>X</strong>
                         : match.second === 'RED' ? "🚩" 
                         : match.second === 'AMBER' ? "⚠️"
                         : match.second 
-            } 
-          });
-        } else {  
+              }
+            });
+          } else {
           // If the entry exists, update its `fields`.
           data[index1].fields[source] = match.second === 'YES' ? "✔" 
-                                      : match.second === 'NO' ? <strong>X</strong> 
+              : match.second === 'NO' ? <strong>X</strong>
                                       : match.second === 'RED' ? "🚩" 
                                       : match.second === 'AMBER' ? "⚠️" 
                                       : match.second;
-        }
+          }
         
       // data.forEach((row) => {
       //   searchResult
@@ -49,45 +59,48 @@ const CompareResults = ({ searchResults, selectedSources }) => {
     });
   }
   });
-  console.log("row is", data);
-const sourceColorMap = {};
+  const sourceColorMap = {};
 
-data.forEach(row => {
-  selectedSources.forEach(source => {
-    Object.keys(row.fields).forEach(fieldKey => {
-      if (row.fields[fieldKey] === "🚩") {
-        sourceColorMap[fieldKey] = "red";
-      } else if (row.fields[fieldKey] === "⚠️") {
-        sourceColorMap[fieldKey] = "orange";
-      }
+  data.forEach(row => {
+    selectedSources.forEach(source => {
+      Object.keys(row.fields).forEach(fieldKey => {
+        if (row.fields[fieldKey] === "🚩") {
+          sourceColorMap[fieldKey] = "red";
+        } else if (row.fields[fieldKey] === "⚠️") {
+          sourceColorMap[fieldKey] = "orange";
+        }
+      });
     });
   });
-});
 
-console.log("sourceColorMap:", sourceColorMap);
-
-  
   selectedSources.forEach((source) => {
     const index = searchResults.findIndex(item => item.source === source);
     const searchResult = searchResults[index];
-    let status = 'Waiting...';
-    if (searchResult.status === 'No match found') {
-      status = 'N/A';
-    } else if (searchResult.status === 'Multiple matches found') {
-      status = 'Resolve...';
-    } else if (searchResult.status === 'One match found') {
-      status = '-';
-    }
-    data.forEach((row) => {
-      if (!row.fields[source]) {
-        row.fields[source] = status;
+      let status = 'Waiting...';
+      if (searchResult.status === 'No match found') {
+        status = 'N/A';
+      } else if (searchResult.status === 'Multiple matches found') {
+        status = 'Resolve...';
+      } else if (searchResult.status === 'One match found') {
+        status = '-';
       }
-    });
+    data.forEach((row) => {
+        if (!row.fields[source]) {
+          row.fields[source] = status;
+        }
+      });
   });
-
+  const handleViewData = (result, idx) => {
+    setResultD(result);
+    setShowDetails(prevShowDetails => !prevShowDetails || viewIndex !== idx);
+    setViewIndex(idx);
+  };
+  
   return (
     <div className="govuk-width-container">
       <main className="govuk-main-wrapper" id="main-content" role="main">
+      {showTable && ( 
+          <>
         <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 className="govuk-fieldset__heading">Compare Results Together</h1>
@@ -106,30 +119,62 @@ console.log("sourceColorMap:", sourceColorMap);
                 </th>
               ))}
             </tr>
-
           </thead>
           <tbody className="govuk-table__body">
-          {data
-        .filter(row => !excludedLabels.includes(row.label)) // Exclude rows with specified labels
-        .map((row, index) =>  (
-              <tr className="govuk-table__row" key={index}>
-                <th scope="row" className="govuk-table__header">{row.label}</th>
-                {selectedSources.map((source) =>
-                  selectedSources.includes(source) && (
-                    <td
-                    className="govuk-table__cell"
-                    key={source}
-                    style={{ color: sourceColorMap[source] || "inherit" }}
-                  >
-                    {row.fields[source]}
-                  </td>
-                  )
-                )}
-              </tr>
-            ))}
-          </tbody>
+            {data
+              .map((row, index) => (
+                <tr className="govuk-table__row" key={index}>
+                  <th scope="row" className="govuk-table__header">{row.label}</th>
+                  {selectedSources.map((source) => (
+                    selectedSources.includes(source) && (
+                      <td
+                        className="govuk-table__cell"
+                        key={source}
+                        style={{ color: sourceColorMap[source] || "inherit" }}
+                      >
+                        {row.fields[source]}
+                      </td>
+                    )
+                  ))}
+                </tr>
+              ))}
+            {flag && (
+              <tr className="govuk-table__row">
+                <th scope="row" className="govuk-table__header">Details</th>
+                {selectedSources.map((source, colIndex) => {
+                  const index = searchResults.findIndex(item => item.source === source);
+                  const searchResult = searchResults[index];
 
+                  // Check if 'isFullRecordAvailable' is true
+                  return (
+                    <td
+                      className="govuk-table__cell"
+                      key={source}
+                      style={{ color: sourceColorMap[source] || "inherit" }}
+                    >
+                      {searchResult.icbMatch?.isFullRecordAvailable ? (
+                        <button onClick={() => handleViewData(searchResult, colIndex)}>
+                          {showDetails && viewIndex === colIndex ? 'Hide Details' : 'View Details'}
+                        </button>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            )}
+          </tbody>
         </table>
+        </>
+        )}
+
+        {showDetails  &&(
+        <div id="view-result-section" style={{ marginTop: '20px' }}>
+      
+          <ViewResult searchResults={resultD} selectedSources={resultD.source} />
+        </div>
+      )}
       </main>
     </div>
   );
