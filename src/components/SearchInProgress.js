@@ -5,7 +5,7 @@ import CompareResults from './CompareResults';
 import CompareMatches from './CompareMatches';
 import SearchResult from '../models/SearchResult';
 import { Client } from '@stomp/stompjs';
-import ViewResult from './ViewResult.js';
+
 import ICBMatch from '../models/ICBMatch.js';
 import ICBMatchRecord from '../models/ICBMatchRecord.js';
 
@@ -130,19 +130,11 @@ const SearchInProgress = () => {
   };
 
   const handleViewDetails = () => {
-    setShowData(false);
     setShowCompareMatches(false);
     setShowCompareResults(true);
   };
-  const handleViewData = (result) => {
-    setShowCompareMatches(false);
-    setShowCompareResults(false);
-    setResult(result)
-    setShowData(true);
-  };
 
   const handleCompareMatches = (searchResult) => {
-    setShowData(false);
     setShowCompareResults(false)
     setShowCompareMatches(true);
     setMultiMatchResult(searchResult);
@@ -186,7 +178,7 @@ const SearchInProgress = () => {
             ) : result.status === 'One match found' && result.icbMatch.isFullRecordAvailable ? (
 
               <>
-                <Button className="tile-button" onClick={() => handleViewData(result)}>View Result</Button>
+               
                 <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>
               </>
             ) : (
@@ -209,12 +201,7 @@ const SearchInProgress = () => {
             setShowCompareMatches={setShowCompareMatches} />
         </div>
       )}
-      {showData && (
-        <div id="view-result-section" style={{ marginTop: '20px' }}>
-
-          <ViewResult searchResults={resultP} selectedSources={resultP.source} />
-        </div>
-      )}
+     
 
       <div className="button-container" style={{ marginTop: '20px' }}>
         <Button onClick={handleBack} className="govuk-button">Back</Button>

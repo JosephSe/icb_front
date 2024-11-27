@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ViewResult = ({ searchResults, selectedSources}) => {
-  console.log("searchResults=========",searchResults)
+  console.log("searchResults is    ",searchResults)
   const data = [
   ];
 
@@ -28,7 +28,6 @@ const ViewResult = ({ searchResults, selectedSources}) => {
       }
     });
   }
-  console.log("data   ",data)
   const capitalizeFirstLetter = (str) => {
     if(str=='fileName'){
       return "Photo"
