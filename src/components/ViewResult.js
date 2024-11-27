@@ -68,11 +68,11 @@ const ViewResult = ({ searchResults, selectedSources}) => {
       <main className="govuk-main-wrapper" id="main-content" role="main">
         <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 className="govuk-fieldset__heading">View Results </h1>
+            <h1 className="govuk-fieldset__heading">View Result - {source} </h1>
           </legend>
         </fieldset>
         <div id="verification-hint" className="govuk-hint">
-          View Results.
+          View Result.
         </div>
         <table className="govuk-table">
           <thead className="govuk-table__head">

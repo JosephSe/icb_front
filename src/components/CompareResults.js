@@ -18,9 +18,6 @@ const CompareResults = ({ searchResults, selectedSources }) => {
     // { label: "Driving Licence Number", fields: { } },
   ];
   let flag=false;
-  
-
-  
     selectedSources.forEach((source) => {
       const index = searchResults.findIndex(item => item.source === source);
       const searchResult = searchResults[index];
@@ -97,10 +94,8 @@ console.log("sourceColorMap:", sourceColorMap);
       });
     });
     const handleViewData = (result) => {
-      setShowTable(false);
       setResultD(result);
-      setShowDetails(true);
-    
+      setShowDetails(prevShowDetails => !prevShowDetails);
     };
     console.log("resultD  ",showDetails)
   
@@ -160,9 +155,9 @@ console.log("sourceColorMap:", sourceColorMap);
                       key={source}
                       style={{ color: sourceColorMap[source] || "inherit" }}
                     >
-                      {searchResult.icbMatch.isFullRecordAvailable ? (
+                      {searchResult.icbMatch?.isFullRecordAvailable ? (
                         <button onClick={() => handleViewData(searchResult)}>
-                          View Details
+                          {showDetails ? 'Hide Details' : 'View Details'}
                         </button>
                       ) : (
                         "-"
