@@ -50,7 +50,10 @@ const SearchInProgress = () => {
 
             // Construct the URL
             const baseUrl = "http://localhost:8080";
-            const formattedUrl = `${baseUrl}/${cleanedFileName}`;
+            var formattedUrl = `${baseUrl}/${cleanedFileName}`;
+            if(cleanedFileName === undefined){
+              formattedUrl = "";
+            }
             return new ICBMatchRecord(
               icbMatchRecordData.firstName,
               icbMatchRecordData.middleName,
@@ -60,7 +63,17 @@ const SearchInProgress = () => {
               icbMatchRecordData.drivingLicenseNumber,
               icbMatchRecordData.passportNumber,
               icbMatchRecordData.birthCertificate,
-              formattedUrl
+              formattedUrl,
+              icbMatchRecordData.flag,
+              icbMatchRecordData.motherName,
+              icbMatchRecordData.motherMaidenName,
+              icbMatchRecordData.motherPlaceOfBirth,
+              icbMatchRecordData.fatherName,
+              icbMatchRecordData.fatherPlaceOfBirth,
+              icbMatchRecordData.registrationDistrict,
+              icbMatchRecordData.subDistrict,
+              icbMatchRecordData.administrativeArea,
+              icbMatchRecordData.dateOfRegistration
             );
           }
           return null; // Return null or handle the case where there's no valid data
