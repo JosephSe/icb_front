@@ -114,7 +114,7 @@ const CompareResults = ({ searchResults, selectedSources }) => {
             <tr className="govuk-table__row">
               <th scope="col" className="govuk-table__header">Search Filters</th>
               {searchResults.map((result) => (
-                <th key={result.source} scope="col" className="govuk-table__header">
+                <th key={result.source} scope="col" className="govuk-table__header" style={{ textAlign: 'center' }}>
                   {result.source === 'LEV' ? 'LEV - Birth' : result.source}
                 </th>
               ))}
@@ -130,7 +130,10 @@ const CompareResults = ({ searchResults, selectedSources }) => {
                       <td
                         className="govuk-table__cell"
                         key={source}
-                        style={{ color: sourceColorMap[source] || "inherit" }}
+                        style={{ 
+                          color: sourceColorMap[source] || "inherit",
+                          textAlign: 'center'
+                        }}
                       >
                         {row.fields[source]}
                       </td>
@@ -145,12 +148,14 @@ const CompareResults = ({ searchResults, selectedSources }) => {
                   const index = searchResults.findIndex(item => item.source === source);
                   const searchResult = searchResults[index];
 
-                  // Check if 'isFullRecordAvailable' is true
                   return (
                     <td
                       className="govuk-table__cell"
                       key={source}
-                      style={{ color: sourceColorMap[source] || "inherit" }}
+                      style={{ 
+                        color: sourceColorMap[source] || "inherit",
+                        textAlign: 'center'
+                      }}
                     >
                       {searchResult.icbMatch?.isFullRecordAvailable ? (
                         <button onClick={() => handleViewData(searchResult, colIndex)}>
