@@ -163,21 +163,20 @@ const SearchInProgress = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
         {searchResults.map((result, index) => (
-
-          <div className="tile" key={result.source}>
-            <div className="tile-content">
+          <div className="tile" key={result.source} style={{ textAlign: 'center' }}>
+            <div className="tile-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <h2 className="govuk-heading-m">{result.source === 'LEV' ? 'LEV - BIRTH' : result.source}</h2>
               {!result.complete ? (
                 <>
                   <div className="loader"></div>
-                  <Paragraph>Searching...</Paragraph>
+                  <Paragraph style={{ margin: '0' }}>Searching...</Paragraph>
                 </>
               ) : (
                 <>
-                  <Paragraph>Search Complete</Paragraph>
-                  <Paragraph>{result.status}</Paragraph>
+                  <Paragraph style={{ margin: '0' }}>Search Complete</Paragraph>
+                  <Paragraph style={{ margin: '0' }}>{result.status}</Paragraph>
                   {result.icbMatch?.verifications && result.icbMatch?.verifications.map((verification, idx) => (
-                    <Paragraph key={idx}>{verification}</Paragraph>
+                    <Paragraph key={idx} style={{ margin: '0' }}>{verification}</Paragraph>
                   ))}
                 </>
               )}
@@ -189,15 +188,10 @@ const SearchInProgress = () => {
             ) : result.status === 'Multiple matches found' ? (
               <Button className="tile-button" onClick={() => handleCompareMatches(result)}>Resolve Multiple Matches</Button>
             ) : result.status === 'One match found' && result.icbMatch.isFullRecordAvailable ? (
-
-              <>
-               
-                <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>
-              </>
+              <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>
             ) : (
               <Button className="tile-button" onClick={handleViewDetails}>View Comparison</Button>
             )}
-
           </div>
         ))}
       </div>
