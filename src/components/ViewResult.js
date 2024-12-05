@@ -91,7 +91,7 @@ const ViewResult = ({ searchResults, selectedSources}) => {
                     {capitalizeFirstLetter(row.label)} {/* Capitalize the first letter of the label */}
                   </th>
                   <td className="govuk-table__cell" key={source}>
-                  {row.label === "dateOfBirth" ? formatDateOfBirth(row.fields[source]) : 
+                  {(row.label === "dateOfBirth" || row.label === 'dateOfRegistration') ? formatDateOfBirth(row.fields[source]) :
                       row.label === "address" ? formatAddress(row.fields[source]) :
                       row.label === "fileName" ? (  // Assuming 'fileName' contains the image path
                         <img 
