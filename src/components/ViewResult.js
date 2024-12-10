@@ -67,7 +67,7 @@ const ViewResult = ({ searchResults, selectedSources}) => {
       <main className="govuk-main-wrapper" id="main-content" role="main">
         <fieldset className="govuk-fieldset" aria-describedby="verification-hint">
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 className="govuk-fieldset__heading">View Result - {source} </h1>
+            <h1 className="govuk-fieldset__heading">View Details - {source} </h1>
           </legend>
         </fieldset>
         <div id="verification-hint" className="govuk-hint">
@@ -76,7 +76,7 @@ const ViewResult = ({ searchResults, selectedSources}) => {
         <table className="govuk-table">
           <thead className="govuk-table__head">
             <tr className="govuk-table__row">
-              <th scope="col" className="govuk-table__header">Search Filters</th>
+              <th scope="col" className="govuk-table__header">Fields</th>
               <th key={source} scope="col" className="govuk-table__header">
                 Details
               </th>
