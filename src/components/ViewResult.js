@@ -71,7 +71,7 @@ const ViewResult = ({ searchResults, selectedSources}) => {
           </legend>
         </fieldset>
         <div id="verification-hint" className="govuk-hint">
-          View Result.
+          View Additional Details.
         </div>
         <table className="govuk-table">
           <thead className="govuk-table__head">
