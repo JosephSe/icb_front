@@ -1,5 +1,5 @@
 class ICBMatchRecord {
-  constructor(firstName, middleName, lastName, dateOfBirth, address, drivingLicenseNumber, passportNumber, birthCertificate, fileName, flag, motherName, motherMaidenName, motherPlaceOfBirth, fatherName, fatherPlaceOfBirth, registrationDistrict, subDistrict, administrativeArea, dateOfRegistration) {
+  constructor(firstName, middleName, lastName, dateOfBirth, address, drivingLicenseNumber, passportNumber, birthCertificate, fileName, flag, motherName, motherMaidenName, motherPlaceOfBirth, fatherName, fatherPlaceOfBirth, registrationDistrict, subDistrict, administrativeArea, dateOfRegistration, serverResponse) {
     this.firstName = firstName || ''; // Default to empty string if not provided
     this.middleName = middleName || '';
     this.lastName = lastName || '';
@@ -19,6 +19,7 @@ class ICBMatchRecord {
     this.subDistrict = subDistrict || '';
     this.administrativeArea = administrativeArea || '';
     this.dateOfRegistration = dateOfRegistration || '';
+    this.serverResponse = serverResponse || '';
   }
 
 }

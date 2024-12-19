@@ -73,7 +73,8 @@ const SearchInProgress = () => {
               icbMatchRecordData.registrationDistrict,
               icbMatchRecordData.subDistrict,
               icbMatchRecordData.administrativeArea,
-              icbMatchRecordData.dateOfRegistration
+              icbMatchRecordData.dateOfRegistration,
+              icbMatchRecordData.serverResponse
             );
           }
           return null; // Return null or handle the case where there's no valid data
