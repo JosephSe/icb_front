@@ -1,29 +1,90 @@
 @import '~govuk-frontend/dist/govuk/all.scss';
-/* src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+// Color Palette
+$primary-color: #007bff;
+$secondary-color: #f8f9fa; // A light gray, good for backgrounds or secondary elements
+$accent-color: #147a5f;    // Darkened teal/green for better contrast (was #20c997)
+$text-color: #212529;      // A dark gray, for primary text content
+$border-color-light: #dee2e6; // Common light border color
+$border-color-standard: #ced4da; // Standard border color for inputs
+
+/* src/App.css - styles originally from here, now adapted */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
+    color: $text-color;
     max-width: 1024px;
     margin: 0 auto;
     padding: 20px;
+    background-color: $secondary-color; // Adding a light background
   }
   
   h1 {
-    color: #0a3d62;
+    color: $primary-color;
+  }
+
+  /* General link style */
+  a {
+    color: $accent-color;
+    text-decoration: none;
+    transition: color 0.3s ease, outline-offset 0.1s ease; // Added outline-offset transition
+    outline-offset: 2px; // Initial state for transition
+    outline: 3px solid transparent; // For focus, initially transparent
+  }
+
+  a:hover {
+    text-decoration: underline;
+    color: darken($accent-color, 5%); // Adjusted darken % due to darker base
+  }
+
+  a:focus {
+    outline-color: rgba($accent-color, 0.5); // Use accent color for link focus
+    text-decoration: none; // Optional: remove underline on focus if outline is prominent
   }
   
-  button {
-    background-color: #4a7c59;
+  button, .button { // Targets both generic HTML button element and .button class
+    background-color: $primary-color;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px; // Modernized padding
     border: none;
-    border-radius: 5px;
+    border-radius: 8px; // Modernized border-radius
     cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); // Subtle shadow
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease; // Smooth transitions
+  }
+
+  button:hover, .button:hover {
+    background-color: darken($primary-color, 5%);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); // Enhanced shadow on hover
+  }
+
+  button:focus, .button:focus {
+    outline: 3px solid rgba($primary-color, 0.4); // Clearer focus outline
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.25); // Focus shadow
+  }
+  
+  button:active, .button:active {
+    transform: translateY(1px); // Click effect
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   }
   
   input[type="text"], input[type="date"], select, textarea {
     width: 100%;
-    padding: 8px;
+    padding: 10px 12px; // Increased padding
     margin: 5px 0;
+    border: 1px solid $border-color-standard; // Updated border color
+    border-radius: 8px; // Modernized border-radius
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box; // Ensures padding doesn't add to width
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  input[type="text"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.25); // Focus shadow
+    outline: none; // Remove default outline
   }
   
   .search-progress {
@@ -32,9 +93,12 @@ body {
   }
   
   .search-progress > div {
-    border: 1px solid #ddd;
-    padding: 10px;
+    border: 1px solid $border-color-light; 
+    padding: 15px; // Increased padding
     width: 30%;
+    background-color: white;
+    border-radius: 8px; // Added border-radius
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); // Subtle shadow
   }
   
   .container {
@@ -58,6 +122,7 @@ body {
   .label {
     width: 200px;
     margin-right: 10px;
+    color: $text-color;
   }
   
   .input {
@@ -71,14 +136,7 @@ body {
     margin-top: 20px;
   }
   
-  .button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+  // .button class styles are now merged with the generic button tag styles above
   
   .checkbox-container {
     display: flex;
@@ -90,6 +148,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: $text-color;
   }
   
   .radio-container {
@@ -101,18 +160,26 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
+    color: $text-color;
   }
   
   .tile {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
-    width: 30%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none; // Removed border
+    border-radius: 12px; // Modernized border-radius
+    padding: 25px; // Increased padding
+    width: 30%; // Or consider flex-basis for responsive layouts
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); // Refined shadow
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 300px;
+    background-color: white;
+    transition: box-shadow 0.3s ease, transform 0.3s ease; // Smooth transitions
+  }
+
+  .tile:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12); // Enhanced shadow on hover
+    transform: translateY(-3px); // Lift effect on hover
   }
   
   .tile-content {
@@ -127,17 +194,20 @@ body {
   .tile-content > div > p {
     margin: 0;
     align-self: auto;
+    color: $text-color;
   }
   
-  .tile-button {
+  .tile-button { // Assuming this is a button or acts like one
     margin-top: 10px;
     width: 100%;
     padding-bottom: 10px;
+    // If it's a button, it might inherit from the general 'button' or '.button' styles
+    // If it's a container for a button, no specific color styles needed here
   }
   
   .loader {
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
+    border: 16px solid $secondary-color; /* Light grey */
+    border-top: 16px solid $primary-color; /* Blue */
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -149,33 +219,41 @@ body {
     100% { transform: rotate(360deg); }
   }
   
-  /* Add these new styles at the end of the file */
-  
   .search-results-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background-color: white;
+    border-radius: 8px; // Rounded corners for the table
+    overflow: hidden; // To ensure border-radius clips content
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); // Subtle shadow for the table
   }
   
   .search-results-table th,
   .search-results-table td {
     text-align: left;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    padding: 12px 15px; // Adjusted padding
+    border-bottom: 1px solid $border-color-light; // Consistent border color
+    color: $text-color;
   }
   
   .search-results-table th {
-    background-color: #f2f2f2;
+    background-color: $secondary-color; 
     font-weight: bold;
+    color: $primary-color; 
   }
   
   .search-results-table tr:last-child td {
-    border-bottom: none;
+    border-bottom: none; // Remove border for the last row
+  }
+
+  .search-results-table tr:hover {
+    background-color: rgba($primary-color, 0.05); // Hover effect for table rows
   }
   
   .search-results-table th:not(:last-child),
   .search-results-table td:not(:last-child) {
-    border-right: 1px solid #ddd;
+    border-right: 1px solid $border-color-light; // Consistent border color
   }
   
   .search-results-table th,

@@ -7,8 +7,7 @@ import SearchFilters from './components/SearchFilters';
 import SearchInProgress from './components/SearchInProgress';
 import CompareResults from './components/CompareResults';
 
-
-//import './App.css';  // Add this line
+import './styles/main.scss';
 
 function App() {
   return (
